@@ -3,7 +3,7 @@
 // full source viewer and chat arrive in later phases.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getAllByRepo, getRepo } from '../lib/db'
+import { deleteRepo, getAllByRepo, getRepo } from '../lib/db'
 import { highlightToLines, type HighlightedLine } from '../lib/highlight'
 import { buildModules } from '../lib/modules'
 import type { EdgeRec, FileRec, RepoRec, SymbolRec } from '../lib/types'
@@ -96,7 +96,17 @@ export default function RepoView({ repoId, onBack }: Props) {
           <h1 className="truncate font-mono text-sm font-semibold text-ink">{repo.fullName}</h1>
           <p className="font-mono text-xs text-ink-3">commit {repo.commit.slice(0, 7)}</p>
         </div>
-        <div className="tabular ml-auto flex items-center gap-4 text-xs text-ink-2">
+        <button
+          onClick={() => {
+            if (window.confirm(`Clear the ${repo.fullName} index from this browser? The repository on GitHub is not affected.`)) {
+              void deleteRepo(repo.id).then(onBack)
+            }
+          }}
+          className="ml-auto rounded-lg border border-line px-3 py-1 text-xs text-ink-3 hover:border-error hover:text-error"
+        >
+          Clear index
+        </button>
+        <div className="tabular flex items-center gap-4 text-xs text-ink-2">
           <span>{repo.stats.files} files</span>
           <span>{repo.stats.symbols} symbols</span>
           <span>
