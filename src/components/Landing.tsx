@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { estimateCost } from '../lib/caps'
 import { getRepoMeta, parseGitHubUrl, resolveCommit, GitHubError, type RepoMeta } from '../lib/github'
-import { listRepos } from '../lib/db'
+import { deleteRepo, listRepos } from '../lib/db'
 import type { RepoRec } from '../lib/types'
 
 export interface IndexTarget {
@@ -166,7 +166,7 @@ export default function Landing({ onStart, onOpen }: Props) {
             <h2 className="text-sm font-semibold text-ink-2">Indexed in this browser</h2>
             <ul className="mt-3 space-y-2">
               {recent.map((repo) => (
-                <li key={repo.id}>
+                <li key={repo.id} className="flex gap-2">
                   <button
                     onClick={() => repo.status === 'ready' && onOpen(repo.id)}
                     disabled={repo.status !== 'ready'}
@@ -178,6 +178,18 @@ export default function Landing({ onStart, onOpen }: Props) {
                         ? `${repo.stats.files} files · ${repo.stats.symbols} symbols`
                         : repo.status}
                     </span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Clear the ${repo.fullName} index from this browser? The repository on GitHub is not affected.`)) {
+                        void deleteRepo(repo.id).then(() => listRepos().then(setRecent))
+                      }
+                    }}
+                    aria-label={`Clear the ${repo.fullName} index from this browser`}
+                    title="Clear this index"
+                    className="shrink-0 rounded-lg border border-line px-3 text-sm text-ink-3 hover:border-error hover:text-error"
+                  >
+                    Clear
                   </button>
                 </li>
               ))}
