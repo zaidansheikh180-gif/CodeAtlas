@@ -20,7 +20,9 @@ Paste any public GitHub repository URL and watch real indexing progress. Get the
 
 Add your own Gemini key or point at your own Ollama endpoint and chat with the repo. Answers cite `file:line` against the indexed commit, light up the matching map nodes, flag any citation that cannot be verified, and show which files the answer used and what it did not see. A cost estimate appears before indexing or chatting. Secret scanning runs before any code reaches a model.
 
-Share a read-only map link with a social preview image, embed it, or export PNG, SVG and JSON. Whole project runs on a self-hosted Supabase, and the project ships with a one-file self-host setup. There is never a shared or owner key.
+Share a read-only map link with a social preview image, embed it, or export PNG, SVG and JSON. There is never a shared or owner key.
+
+Superseded 2026-10-16 (evening): the sentence "Whole project runs on a self-hosted Supabase, and the project ships with a one-file self-host setup" described the server plan. v1 is static-only (owner decision); Supabase, the share preview image and the hosted embed are v2. In v1 a shared link re-indexes in the recipient's browser and the exported standalone HTML file is the portable share.
 
 Long-term north star (a superset of what existing code-graph tools offer, done in one hosted place):
 - Understanding: blast radius, community and module summaries, path between two nodes, guided tours ordered by dependency, a "start here" path, plain-English node summaries, Newcomer and Engineer views.
@@ -37,14 +39,28 @@ Scope note (2026-10-16, owner decision): release one now includes all functions 
 
 ## Next up
 
-First, owner decisions on the flagged items in [PRD.md](PRD.md). Then phase 1, the spine:
+Updated 2026-10-16 (evening) for the static-only v1. Phase 1, the browser spine:
 
-1. Self-hosted Supabase on the free-tier VM, with a backup job; measure real headroom.
-2. Indexing worker for one small public repo: clone, filter, secret scan, chunk, embed with a supplied key.
-3. Chat with `file:line` citations, using vector retrieval only, with the user's own key.
-4. Then the map (phase 2): tree-sitter symbols and edges, layered canvas map, source viewer.
+1. Static app skeleton with the Web Worker parsing pipeline and the IndexedDB storage layer; measure parse time and memory on the test repo set.
+2. In-browser indexing of one small public repo: archive fetch, filter, secret scan, tree-sitter (WASM) parse, graph build, per-stage progress.
+3. Chat with `file:line` citations calling the visitor's own Gemini key directly from the browser; Ollama mode with the CORS connectivity check.
+4. Then the map: layered canvas map, source viewer, citation-to-node highlighting.
+
+(Superseded: the previous list started with self-hosted Supabase on the free-tier VM - that whole track is v2 now.)
 
 ## Log
+
+### 2026-10-16 (follow-up decisions)
+- Owner answered the three open decisions from the static-v1 rescope: (1) visitors may optionally paste their own GitHub token, stored only in their browser, to raise the API rate limit - Chosen. (2) The landing-page examples ship as bundled pre-built graphs with the static site, so the demo is instant - Chosen. (3) The GitHub Action stays in v2, with the CI-local variant (analysis inside the CI job, no hosted API) as its planned v2 form.
+- Applied across PRD.md, TRD.md, APP_FLOW.md, ARCHITECTURE.md, IMPLEMENTATION_PLAN.md and MEMORY.md. Doc edits for the whole static-v1 rescope are prepared and approved for push; pushing follows.
+
+
+### 2026-10-16 (static-only v1)
+- Owner decision: v1 is static-only. Asked whether CodeAtlas needs a backend at all, the owner chose the static option: browser fetches the public repo from the GitHub API, parses and builds the map client-side (tree-sitter WASM in a Web Worker), stores it in IndexedDB, and calls the visitor's own Gemini key or Ollama endpoint directly. Nothing was built or run.
+- Moved to v2 with that decision: the hosted MCP endpoint (FR-039), the GitHub Action (FR-032, a CI-local variant is Proposed), the multi-repo registry (FR-041), hosted share previews and embeds (parts of FR-034/FR-035), and the whole server track - API server, indexing worker, self-hosted Supabase, accounts, token/abuse design (TASK-002, TASK-025, TASK-026, TASK-029).
+- Annotated across PRD.md, TRD.md, APP_FLOW.md, BACKEND_SCHEMA.md, IMPLEMENTATION_PLAN.md, ARCHITECTURE.md, PROGRESS.md, README.md and ROADMAP.md: every FR and task now carries a Release label; superseded text is kept in place with notes. Decision recorded in MEMORY.md.
+- New v1 risks written down with mitigations: GitHub anonymous rate limit (archive-first fetching; optional visitor token accepted by the owner the same evening), large-repo performance in one tab (size caps, measured in phase 1), Ollama CORS setup (detection plus guidance in the setup card).
+
 
 ### 2026-10-16 (scope and spine audit)
 - Owner decision: release one includes all functions of graphify, Understand-Anything, codegraph, code-review-graph, repomix, archify, headroom and graph-engineering. Catalogued as FR-001 to FR-044 in [PRD.md](PRD.md); features not adopted are listed there with reasons.
