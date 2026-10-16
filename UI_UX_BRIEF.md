@@ -1,0 +1,38 @@
+# CodeAtlas UI/UX design brief
+
+Status: pre-code. [DESIGN.md](DESIGN.md) is the full rulebook and wins if the two ever disagree. This file is the quick-reference brief in the template format. The color palette below is set by the owner. Fonts and the remaining values are not chosen yet and say TBD rather than guess.
+
+| Field | Content |
+|---|---|
+| Aesthetic | Premium, restrained, dark first. The map is the showpiece: a readable architecture, never a hairball. Plain language, few effects, each with a purpose. No AI-slop patterns (glowing orbs, default purple-blue gradients, generic three-card grids, sparkle icons, invented stats). |
+| Primary Color | Dragonfruit, HEX #FF4696 (pink). The one accent color, used for selection and primary actions. |
+| Background Color | Night Violet, HEX #1E1033 (deep violet). Base surface. Extra surface steps (raised panels, borders): TBD, to be derived from this base. |
+| Text Color | Dragonfruit #FF4696 on Night Violet surfaces, and Night Violet #1E1033 on Dragonfruit fills (for example buttons), as in the owner's palette reference. Neutral body and secondary text colors: TBD. Must meet WCAG AA contrast; Dragonfruit on Night Violet measures about 5.6:1 (computed), which passes AA for normal text. Long code and body text may need a neutral, TBD. |
+| Accent / CTA Color | Dragonfruit #FF4696, same as primary. Night Violet text on it. Color on the map encodes layer or module, and edge confidence; never color alone, always paired with shape, label or pattern. |
+| Font | TBD. One clean sans for UI, one monospace for code, paths and line numbers. Few size steps. Tabular numbers for counts and line numbers. |
+| Border Radius | TBD value; rule is consistent radii everywhere. |
+| Shadows | Hairline borders instead of heavy shadows. Layer by surface color, not glow. |
+| Dark/Light Mode | Dark first. Light theme is later work. |
+| Reference Apps | TBD. To be named by the owner. Related tools that inspired the product are listed in the private teardown, not here. |
+| Mobile | Tight, deliberate spacing. Map viewable and tappable. Panels as bottom sheets. Nothing hidden behind hover. |
+
+## Key UI patterns
+
+- Canvas graph with layered drill-down (top level about 8 to 12 nodes), breadcrumb, zoom-dependent labels, capped visible edges.
+- Edge confidence shown as EXTRACTED or INFERRED, with a filter for extracted only.
+- Side panel for source, callers and callees.
+- Citation chips (`path:line`) that open the source and light up the map node.
+- Search overlay for files and symbols.
+- State cards for indexing, empty, no key, quota, error and excluded files.
+
+## Accessibility
+
+- WCAG AA contrast, full keyboard access, visible focus rings.
+- Non-visual alternative to the map: a navigable tree or list.
+- Reduced-motion and screen-reader labels required.
+
+## Open questions
+
+- Neutral text and surface steps, status colors (error, success), and the map layer colors derived from this palette.
+- Fonts, radius and reference apps.
+- Light theme timing.
