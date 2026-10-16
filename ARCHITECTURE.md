@@ -74,6 +74,26 @@ A map can be shared by link as a read-only view. Static v1 (2026-10-16, evening)
 
 ## 2. The pieces
 
+
+Source of truth for how CodeAtlas is built. Anyone (human or LLM) reading only this file should understand the whole system. Update it in the same commit as any change that alters the design.
+
+**Status: pre-code.** Nothing below is built yet. Scope update 2026-10-16 (evening, owner decision): v1 is static-only - no server, no database server, no accounts. Sections below describe the original four-piece server design, now annotated: what runs in the browser in v1 and what moves to v2. The v2 design is kept for when a server returns. Everything is planned unless [PROGRESS.md](PROGRESS.md) says it shipped. Open decisions are listed at the end.
+
+Status labels: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
+
+Related files: [README.md](README.md) (pitch), [ROADMAP.md](ROADMAP.md) (build order), [PROGRESS.md](PROGRESS.md) (dated log), [DESIGN.md](DESIGN.md) (UI rules). Planning documents: [PRD.md](PRD.md), [TRD.md](TRD.md), [APP_FLOW.md](APP_FLOW.md), [UI_UX_BRIEF.md](UI_UX_BRIEF.md), [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+
+## 1. Product shape
+
+Paste a public GitHub repository URL. CodeAtlas indexes it and shows two things on one screen:
+
+- **The map:** an interactive, layered architecture graph of the codebase (modules, files, symbols, and the imports and calls between them). Free for everyone, no account, no key.
+- **The chat:** questions answered from the actual code, with clickable `file:line` citations tied to the indexed commit. Needs the user's own model access (see section 6).
+
+A map can be shared by link as a read-only view. Static v1 (2026-10-16, evening): the link carries the repo, commit and view state, and the recipient's browser re-indexes the repo; the exported standalone HTML file is the share that opens instantly. Hosted share previews are v2.
+
+## 2. The pieces
+
 ### v1: one piece (static-only, owner decision 2026-10-16, evening)
 
 ```
