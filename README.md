@@ -51,6 +51,16 @@ Repository size caps, secret scanning and honest failure states are part of the 
 
 ## Project documents
 
-- [Roadmap](ROADMAP.md)
+- [Roadmap](ROADMAP.md) - planned build order and releases.
+- [Architecture](ARCHITECTURE.md) - source of truth for the system design.
+- [Progress](PROGRESS.md) - dated log of what actually happened, plus the end goal.
+- [Design](DESIGN.md) - UI and visual design rules.
+- [Memory](MEMORY.md) - decision log: what was decided, why, and how it was implemented.
+- [Product requirements](PRD.md) - planned product scope, target user and features.
+- [Technical requirements](TRD.md) - quick stack lookup; ARCHITECTURE.md owns the design.
+- [App flow](APP_FLOW.md) - planned screens and core user journeys.
+- [UI/UX brief](UI_UX_BRIEF.md) - quick-reference design brief with the color palette.
+- [Backend schema](BACKEND_SCHEMA.md) - planned database schema sketch.
+- [Implementation plan](IMPLEMENTATION_PLAN.md) - build phases with done criteria.
 
 CodeAtlas takes inspiration from existing code-graph and repository tools while aiming to build its own interface and workflow. The feature superset is a long-term direction, not a claim of current parity.
