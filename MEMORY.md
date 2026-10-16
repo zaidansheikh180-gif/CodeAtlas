@@ -70,3 +70,11 @@ The living decision log for this repository and its codebase: what was decided, 
 **Why:** The interface should help people understand the code rather than overwhelm them with nodes or decoration. Connecting answers to source and the map makes the evidence easier to inspect.
 
 **How implemented:** [DESIGN.md](DESIGN.md) records dark-surface, typography, spacing, motion, map, citation, state and accessibility rules. It covers indexing, empty, no-key, quota, error and excluded-file states. These are documented design rules only: there are no implemented screens, animations or citation interactions yet.
+
+### 2026-10-16 - Add the doc-spine planning documents and set the color palette
+
+**Decision:** Adopt six standard planning documents from the doc-spine template - PRD.md, TRD.md, APP_FLOW.md, UI_UX_BRIEF.md, BACKEND_SCHEMA.md and IMPLEMENTATION_PLAN.md - with unset values marked TBD. Set the UI palette to Dragonfruit #FF4696 (single accent) on Night Violet #1E1033 (base background), with pink text on violet surfaces and violet text on pink fills. Expand the README document list to link every project document.
+
+**Why:** The template documents capture product scope, stack, screens, schema and build phases in fixed fields that can be filled in as decisions land, instead of writing each document from scratch. The palette came from the owner's own reference image. The README list previously linked only ROADMAP.md, and the owner asked for the full list.
+
+**How implemented:** The six documents were published to main on 2026-10-16, one commit per file. [UI_UX_BRIEF.md](UI_UX_BRIEF.md) records the palette with the remaining values as TBD; [DESIGN.md](DESIGN.md) now names the palette in its visual-system section and requires flat fills, no gradients or glow. [README.md](README.md)'s project-documents section links all eleven documents. This supersedes the note in the 2026-10-10 entry that the README linked only ROADMAP.md. All of this is pre-code documentation; nothing is implemented.
