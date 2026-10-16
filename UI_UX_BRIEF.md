@@ -11,8 +11,8 @@ Status labels used in this file: Verified, Chosen, Proposed, Planned, Assumption
 | Background Color | Night Violet, HEX #1E1033 (deep violet). Base surface. Extra surface steps (raised panels, borders): TBD, to be derived from this base. |
 | Text Color | Dragonfruit #FF4696 on Night Violet surfaces, and Night Violet #1E1033 on Dragonfruit fills (for example buttons), as in the owner's palette reference. Neutral body and secondary text colors: TBD. Must meet WCAG AA contrast; Dragonfruit on Night Violet measures about 5.6:1 (computed), which passes AA for normal text. Long code and body text may need a neutral, TBD. |
 | Accent / CTA Color | Dragonfruit #FF4696, same as primary. Night Violet text on it. Color on the map encodes layer or module, and edge confidence; never color alone, always paired with shape, label or pattern. |
-| Font | TBD. One clean sans for UI, one monospace for code, paths and line numbers. Few size steps. Tabular numbers for counts and line numbers. |
-| Border Radius | TBD value; rule is consistent radii everywhere. |
+| Font | Inter (UI) and JetBrains Mono (code, paths, line numbers), bundled via Fontsource. Chosen in phase 1. Few size steps. Tabular numbers for counts and line numbers. |
+| Border Radius | 8px on inputs and buttons, 10-12px on cards and panels. Chosen in phase 1; consistent everywhere. |
 | Shadows | Hairline borders instead of heavy shadows. Layer by surface color, not glow. |
 | Dark/Light Mode | Dark first. Light theme is later work. |
 | Reference Apps | TBD. To be named by the owner. Related tools that inspired the product are listed in the private teardown, not here. |

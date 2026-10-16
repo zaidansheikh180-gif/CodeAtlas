@@ -39,16 +39,23 @@ Scope note (2026-10-16, owner decision): release one now includes all functions 
 
 ## Next up
 
-Updated 2026-10-16 (evening) for the static-only v1. Phase 1, the browser spine:
+Updated 2026-10-16 (late evening): phase 1 (browser spine) is built on the `instinct` branch.
 
-1. Static app skeleton with the Web Worker parsing pipeline and the IndexedDB storage layer; measure parse time and memory on the test repo set.
-2. In-browser indexing of one small public repo: archive fetch, filter, secret scan, tree-sitter (WASM) parse, graph build, per-stage progress.
-3. Chat with `file:line` citations calling the visitor's own Gemini key directly from the browser; Ollama mode with the CORS connectivity check.
-4. Then the map: layered canvas map, source viewer, citation-to-node highlighting.
+1. Phase 2: IndexedDB read/eviction hardening and measured size caps on medium and large repos (write, read back, evict cleanly; then record final cap values).
+2. Phase 3 (settings): local model settings - Gemini key and Ollama endpoint stored only in the browser, Ollama CORS connectivity check; optional visitor GitHub token storage (owner decision 2026-10-16).
+3. Phase 4: indexing depth - pause/resume from the jobs store, chunking and token counting.
+4. Then chat with citations (phase 5) and the layered map with source viewer (phase 6).
 
 (Superseded: the previous list started with self-hosted Supabase on the free-tier VM - that whole track is v2 now.)
 
 ## Log
+
+### 2026-10-16 (phase 1 built, instinct branch)
+- Phase 1 (browser spine) built and verified in a real browser (headless Chromium, Playwright): static React + Vite + Tailwind v4 app (Bun), Web Worker indexing pipeline, IndexedDB storage layer, GitHub fetching, first module map. Code lives on the `instinct` branch; main is untouched.
+- Measured finding that changed the design: the GitHub zipball endpoint redirects to codeload.github.com, whose CORS header only allows render.githubusercontent.com - a browser app cannot read the archive from any other origin. Fetching instead uses one git-tree API request for the recursive file list, then raw.githubusercontent.com file downloads (CORS-open, not counted against the API rate limit), 8 at a time. Recorded in TRD.md and ARCHITECTURE.md.
+- Measured on a 4-repo test set (this browser run, anonymous rate limit): sindresorhus/is - 8 files kept, 5 parsed, 292 symbols, 680 edges, total 0.8s. pallets/itsdangerous - 28 kept, 15 parsed, 144 symbols, 271 edges, 1.1s. expressjs/express - 156 kept, 141 parsed, 231 symbols, 932 edges, 1.1s (after assignment-expression symbols were added mid-measurement). psf/requests - 60 kept, 37 parsed, 807 symbols, 1878 edges, 0.8s. JS heap delta per run: about 1 MB (Chrome performance.memory). Parse time per repo stayed under 0.4s at this scale; the caps (4000 files, 25 MB source, 1 MB per file) are untested at the top end - larger repos still to be measured.
+- Scope note: these repos are small. Numbers are real but not yet evidence for the caps; phase 2 measures medium and large repos.
+- Extraction coverage note: JS symbols cover function/class/method declarations, arrow-function variables and `exports.x = function` assignments; calls and imports resolve same-file, imported-name and unique-name (INFERRED) only. Python covers defs, classes and imports (including src-layout resolution). Everything else degrades to files only, by design.
 
 ### 2026-10-16 (follow-up decisions)
 - Owner answered the three open decisions from the static-v1 rescope: (1) visitors may optionally paste their own GitHub token, stored only in their browser, to raise the API rate limit - Chosen. (2) The landing-page examples ship as bundled pre-built graphs with the static site, so the demo is instant - Chosen. (3) The GitHub Action stays in v2, with the CI-local variant (analysis inside the CI job, no hosted API) as its planned v2 form.

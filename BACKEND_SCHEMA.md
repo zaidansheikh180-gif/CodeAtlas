@@ -28,7 +28,7 @@ No migration file exists, so every object here is Planned.
 
 ## v1 local storage (IndexedDB) - added 2026-10-16 (evening)
 
-Status: Planned. v1 has no server, so the index and chat state live in the visitor's browser. Object stores (IndexedDB), mirroring the v2 tables:
+Status: Implemented in phase 1 (`instinct` branch, IndexedDB database `codeatlas`, version 1). v1 has no server, so the index and chat state live in the visitor's browser. All stores below are created at version 1 so later phases add no migrations; analytics and chat stores stay empty until their phase ships. Record shapes live in `src/lib/types.ts`. Two decisions made in phase 1: the `files` store keeps the full text of kept source files (bounded by the caps) so the source viewer and later citation checks need no refetch, and `content_hash` is the git blob SHA from the tree response, not a recomputed hash. Object stores (IndexedDB), mirroring the v2 tables:
 
 | Store | Holds | v2 counterpart |
 |---|---|---|

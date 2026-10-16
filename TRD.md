@@ -22,13 +22,13 @@ Status labels used in this file: Verified, Chosen, Proposed, Planned, Assumption
 
 | Item | Status |
 |---|---|
-| React, Vite, Tailwind | Proposed |
+| React, Vite, Tailwind | Chosen (built in phase 1, instinct branch) |
 | Self-hosted Supabase (Postgres, pgvector, Auth) | Superseded for v1 (2026-10-16, evening): moved to v2 with the whole server plan |
 | Static-only v1: no server, browser-only indexing, IndexedDB storage, direct browser-to-model calls | Chosen (owner, 2026-10-16, evening) |
 | tree-sitter as WASM in a Web Worker | Chosen (2026-10-16, evening; the only way to parse in a browser tab without freezing it) |
 | tree-sitter parsing | Proposed |
 | API framework (Fastify or FastAPI) | TBD (v2 only; no API in v1) |
-| Graph renderer | TBD |
+| Graph renderer | Chosen in phase 1: custom canvas 2D + d3-force for the module map; layered renderer open for phase 6 |
 | Graph analytics (communities, centrality) library | TBD |
 | Static host | TBD |
 | Gemini and Ollama as the only model providers | Chosen |
@@ -38,7 +38,7 @@ Nothing is Verified: no code or tooling exists yet.
 
 ## Runtime, toolchain and workflow
 
-TBD. Language runtime, package manager, build, lint, type-check and test commands are fixed in phase 1 and recorded here with their real commands.
+Fixed in phase 1 (Verified on the `instinct` branch): Node 22+ or Bun for tooling; Vite 7 dev server and build; TypeScript 5.8 (strict); React 19; Tailwind CSS 4 (`@tailwindcss/vite`). Commands: `bun install`, `bun run dev` (dev server), `bun run build` (type-check plus production build), `bun run typecheck`. Key libraries (Chosen in phase 1): `web-tree-sitter` + `tree-sitter-wasms` (WASM grammars as Vite `?url` assets), `idb` (IndexedDB), `d3-force` (map layout), Inter and JetBrains Mono via Fontsource. Graph renderer: custom canvas 2D renderer (Chosen in phase 1) - the layered drill-down renderer is still open for phase 6.
 
 ## Third-party services
 
@@ -60,7 +60,7 @@ Static v1 (2026-10-16, evening): there are no API endpoints; the browser talks o
 
 ## Folder structure and naming conventions
 
-TBD. To be fixed when phase 1 starts and recorded here. Docs live at the repo root as uppercase `.md` files.
+Fixed in phase 1: `src/lib/` (shared modules), `src/workers/` (indexing worker, extraction, graph build), `src/components/` (React screens), `src/theme.css` (Tailwind tokens), docs at the repo root as uppercase `.md` files. File names: lowercase with hyphens for libraries (`github.ts`), PascalCase for components (`MapCanvas.tsx`).
 
 ## Open questions
 

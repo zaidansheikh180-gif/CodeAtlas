@@ -27,8 +27,11 @@ A map can be shared by link as a read-only view. Static v1 (2026-10-16, evening)
         +--> Web Worker: tree-sitter (WASM) parsing, graph building, analytics
         +--> IndexedDB: repos, files, symbols, edges, chunks, vectors, chats, settings
         |
-        +--> GitHub API (repo archive first, then contents/compare as needed; anonymous
-        |    limit ~60 requests/hour per visitor IP; optional visitor token, Chosen 2026-10-16)
+        +--> GitHub API (recursive git tree for the file list, then raw file downloads
+        |    from raw.githubusercontent.com - the zipball/codeload endpoint is not
+        |    CORS-readable, measured 2026-10-16. Anonymous API limit ~60 requests/hour
+        |    per visitor IP; raw downloads do not count against it. Optional visitor
+        |    token, Chosen 2026-10-16)
         +--> the visitor's own Gemini key (embeddings, chat) - direct browser call
         +--> the visitor's own Ollama endpoint (embeddings, chat) - direct browser call,
              needs OLLAMA_ORIGINS set on the visitor's side
@@ -58,7 +61,7 @@ The frontend is the whole app. Indexing, retrieval, citation checks and exports 
 
 ## 3. Data flow: indexing
 
-Update 2026-10-16 (evening): in v1 every stage below runs in the visitor's browser. Submit creates rows in IndexedDB; instead of a server-side shallow clone, the browser downloads the repo archive (zipball) and records the commit hash; parsing runs in a Web Worker. The server version below is the v2 flow.
+Update 2026-10-16 (evening): in v1 every stage below runs in the visitor's browser. Submit creates rows in IndexedDB; instead of a server-side shallow clone, the browser reads the repo from GitHub and records the commit hash; parsing runs in a Web Worker. The server version below is the v2 flow. Update 2026-10-16 (late evening, measured): the zipball archive path was replaced - codeload.github.com answers with a CORS header that only allows render.githubusercontent.com, so no browser app can read the archive. The implemented flow: one recursive git-tree API request gives the file list (with sizes and blob hashes), filtering happens before download, and kept files download from raw.githubusercontent.com (CORS-open, not rate-limited like the API).
 
 1. **Submit.** User pastes a public repo URL. The API validates it and creates a `repos` row and a `jobs` row.
 2. **Clone.** Worker makes a shallow clone and records the commit hash.
@@ -113,8 +116,8 @@ Open design work, updated 2026-10-16 (evening): the server-side Ollama concern i
 
 ## 7. Limits and safety
 
-- **Size caps** on file count and total size after filtering. In v1 the caps reflect one browser tab's memory. Exact values are set in phase 1 and recorded here. The cost estimate is shown before indexing.
-- **GitHub rate limit (added 2026-10-16, evening):** anonymous API use is limited to about 60 requests/hour per visitor IP. The archive-first fetch path exists because of this; a rate-limit hit gets a named state with the wait time and the optional-token path (Chosen, owner, 2026-10-16 evening).
+- **Size caps** on file count and total size after filtering. In v1 the caps reflect one browser tab's memory. Set in phase 1 (`src/lib/caps.ts`): 4,000 files, 25 MB of source text, 1 MB per file. Untested at the top end (phase 2 measures medium and large repos); the cost estimate is shown before indexing.
+- **GitHub rate limit (added 2026-10-16, evening):** anonymous API use is limited to about 60 requests/hour per visitor IP. One index run costs 3 API requests (repo metadata, commit lookup, file tree); file contents come from raw.githubusercontent.com, which does not count against the limit. A rate-limit hit gets a named state with the wait time and the optional-token path (Chosen, owner, 2026-10-16 evening).
 - **Secret scanning** runs before any code reaches a model or an embedding index. Excluded files are listed.
 - **Honest failures:** unsupported language, oversized repo, quota hit and unreachable endpoint each get a plain explanation, not a generic error.
 - **Keys** are encrypted at rest and never logged.
@@ -122,7 +125,14 @@ Open design work, updated 2026-10-16 (evening): the server-side Ollama concern i
 
 ## 8. Current status
 
-Pre-code. This repository holds documentation only: the README, roadmap, these source files and the planning documents linked from the README. No app, schema, server or demo exists. See [PROGRESS.md](PROGRESS.md) for the latest state.
+Phase 1 built on the `instinct` branch (2026-10-16): the static app skeleton, Web Worker parsing pipeline (tree-sitter WASM; JS/TS/TSX and Python), IndexedDB storage (full v1 store set created at DB version 1), GitHub tree+raw fetching, secret scanning, per-stage progress, size caps, and the first top-level module map (canvas, d3-force) with a module file panel and source preview. `main` holds documentation only. See [PROGRESS.md](PROGRESS.md) for measurements and the latest state.
+
+### Folder structure (as built, phase 1)
+
+- `src/lib/` - shared modules: github (API + raw URLs), caps, filter, secrets, db (IndexedDB), pipeline (worker protocol), modules (map aggregation), types
+- `src/workers/` - `index.worker.ts` (pipeline orchestration) and `parse.ts`, `graph.ts` (tree-sitter extraction and graph build, worker-side)
+- `src/components/` - Landing, Indexing (progress), RepoView, MapCanvas
+- Wasm grammars and the tree-sitter runtime load from npm packages (`web-tree-sitter`, `tree-sitter-wasms`) as Vite `?url` assets; no binaries live in the repo
 
 ## 10. Release-one scope and components (added 2026-10-16)
 

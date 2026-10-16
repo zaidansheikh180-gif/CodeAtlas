@@ -15,10 +15,10 @@ Design rules for the app. Source of truth for UI decisions; update it when a rul
 ## Visual system
 
 - **Theme:** dark first. Deep violet surfaces with a small set of steps derived from the base; one accent color for selection and primary actions. Light theme is later work.
-- **Palette (set by the owner):** Dragonfruit `#FF4696` (pink) is the single accent, used for selection, primary actions and key text on dark. Night Violet `#1E1033` (deep violet) is the base background. Use Night Violet text on Dragonfruit fills and Dragonfruit text on Night Violet surfaces. Dragonfruit on Night Violet is about 5.6:1 contrast (computed). Neutral text steps, extra surface steps, status colors and map layer colors are not chosen yet (TBD); see [UI_UX_BRIEF.md](UI_UX_BRIEF.md).
-- **Type:** one clean sans for UI, one monospace for code, paths and line numbers. A clear size scale with few steps. Tabular numbers for counts and line numbers.
+- **Palette (set by the owner):** Dragonfruit `#FF4696` (pink) is the single accent, used for selection, primary actions and key text on dark. Night Violet `#1E1033` (deep violet) is the base background. Use Night Violet text on Dragonfruit fills and Dragonfruit text on Night Violet surfaces. Dragonfruit on Night Violet is about 5.6:1 contrast (computed). Steps derived from the base (Chosen in phase 1, `src/theme.css`): surfaces `#281741`, `#322052`, `#3D2A63`; hairline border `#463171`; text `#F2EDFA` (primary), `#B8A8D9` (secondary), `#8A76B3` (muted); status `#3ECF8E` success, `#F5B942` warning, `#FF5C7A` error, `#7AB8FF` info. Map module colors: a 12-color categorical set derived from the palette family (`src/lib/modules.ts`), always paired with a text label.
+- **Type:** Inter for UI and JetBrains Mono for code, paths and line numbers (Chosen in phase 1, bundled via Fontsource). A clear size scale with few steps. Tabular numbers for counts and line numbers.
 - **Spacing:** one spacing scale. Tight, deliberate spacing on mobile; no oversized padding to fill screens.
-- **Shape and depth:** consistent radii, hairline borders instead of heavy shadows. Layer by surface color, not by glow.
+- **Shape and depth:** 8px radius on inputs and buttons, 10-12px on cards and panels (Chosen in phase 1); hairline borders instead of heavy shadows. Layer by surface color, not by glow.
 - **Motion:** short, purposeful transitions (zoom to a node, panel slide). Respect reduced-motion. No decorative animation loops.
 - **Color meaning:** color encodes layer or module on the map and confidence on edges. Never use color alone; pair it with shape, label or pattern.
 

@@ -68,3 +68,17 @@ Repository size caps, secret scanning and honest failure states are part of the 
 - [Implementation plan](IMPLEMENTATION_PLAN.md) - build phases with done criteria.
 
 CodeAtlas takes inspiration from existing code-graph and repository tools while aiming to build its own interface and workflow. Covering their functions is the release-one scope, not a claim of current parity: nothing is built yet.
+
+## Development
+
+Phase 1 of the app (the browser spine: indexing pipeline, IndexedDB storage and the first module map) is built on the `instinct` branch; `main` holds documentation only until the owner merges.
+
+Run locally:
+
+```
+git checkout instinct
+bun install
+bun run dev
+```
+
+`bun run build` type-checks and produces the production build.
