@@ -1,6 +1,6 @@
 # CodeAtlas roadmap
 
-CodeAtlas is in early planning. This is the intended build order, not a list of shipped features or a release-date promise.
+CodeAtlas v1 is in build on the `instinct` branch (see [PROGRESS.md](PROGRESS.md)). This is the intended build order, not a release-date promise.
 
 ## Product shape
 
@@ -14,7 +14,7 @@ Update 2026-10-16 (evening, owner decision): v1 is static-only. The v1 architect
 
 - React, Vite and Tailwind frontend for the map, source viewer, chat and settings - this is the whole app.
 - A Web Worker does tree-sitter (WASM) parsing, graph building and analytics; IndexedDB holds the index and chat history.
-- The browser fetches public repositories from the GitHub API (archive first, contents and compare data as needed; the anonymous limit is about 60 requests/hour per visitor).
+- The browser fetches public repositories from the GitHub API (the git tree listing plus raw file downloads - the zipball endpoint is not CORS-readable from a browser - and compare data as needed; the anonymous limit is about 60 requests/hour per visitor).
 - Graph-assisted retrieval combines matching chunks with related symbols and checks citations against the indexed commit, all locally. Chat calls the visitor's own Gemini key or Ollama endpoint directly.
 
 v2 (the original server plan, kept for that release):
@@ -27,9 +27,13 @@ The API framework, graph renderer, hosting capacity and safe connection design f
 
 ## Phase 1: Prove the pipeline
 
+Update 2026-10-16 (build): the browser pipeline ships on `instinct` - tree+raw fetching with timeouts and retry, worker parsing (JS/TS/TSX, Python), IndexedDB storage, per-stage progress, size caps and secret scanning.
+
 Index one small public repository with a supplied key. Build the first schema, queue and retrieval endpoint. Return answers with source references in a minimal UI. Establish size limits and secret filtering before sending code to a model.
 
 ## Phase 2: Make the code explorable
+
+Update 2026-10-16 (build): symbol extraction, import and call edges with confidence, the top-level module map and the source preview with syntax coloring ship on `instinct`; layered drill-down continues.
 
 Add tree-sitter symbol extraction, imports and call edges, a layered map and a source viewer. Support no-key graph browsing and show unresolved relationships rather than inventing edges.
 
