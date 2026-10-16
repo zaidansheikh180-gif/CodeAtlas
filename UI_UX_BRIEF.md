@@ -2,6 +2,8 @@
 
 Status: pre-code. [DESIGN.md](DESIGN.md) is the full rulebook and wins if the two ever disagree. This file is the quick-reference brief in the template format. The color palette below is set by the owner. Fonts and the remaining values are not chosen yet and say TBD rather than guess.
 
+Status labels used in this file: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
+
 | Field | Content |
 |---|---|
 | Aesthetic | Premium, restrained, dark first. The map is the showpiece: a readable architecture, never a hairball. Plain language, few effects, each with a purpose. No AI-slop patterns (glowing orbs, default purple-blue gradients, generic three-card grids, sparkle icons, invented stats). |
@@ -15,6 +17,18 @@ Status: pre-code. [DESIGN.md](DESIGN.md) is the full rulebook and wins if the tw
 | Dark/Light Mode | Dark first. Light theme is later work. |
 | Reference Apps | TBD. To be named by the owner. Related tools that inspired the product are listed in the private teardown, not here. |
 | Mobile | Tight, deliberate spacing. Map viewable and tappable. Panels as bottom sheets. Nothing hidden behind hover. |
+
+## Experience goals
+
+Status: Proposed. A visitor should reach a readable map of an unfamiliar repo with no setup, then find where a symbol is used and what it affects, and ask a cited question when they bring a model. Observable check: from the landing page, a first-time user opens an example map and reaches a node's source without help.
+
+## Reference analysis
+
+Status: Proposed. The owner has not named reference apps; the Reference Apps field above stays TBD. The inspired tools are studied for qualities, not copied: Archify (standalone, shareable, truthful interaction: focus, upstream and downstream reach), CodeGraph (caller, source, callee view), Graphify (confidence tags on every edge), Understand-Anything (tours and persona-adaptive detail). Sources: their public READMEs, read 2026-10-16. Not inspected: any hosted demo.
+
+## Interaction principles for new views
+
+Impact, tour and export views follow the same rules as the map: keyboard access, no hover-only controls, generated text always labelled, and parsed facts never styled like generated text. Detailed component rules belong in [DESIGN.md](DESIGN.md).
 
 ## Key UI patterns
 
@@ -36,3 +50,5 @@ Status: pre-code. [DESIGN.md](DESIGN.md) is the full rulebook and wins if the tw
 - Neutral text and surface steps, status colors (error, success), and the map layer colors derived from this palette.
 - Fonts, radius and reference apps.
 - Light theme timing.
+- Owner to name reference apps.
+- Look of impact, tour and export views.
