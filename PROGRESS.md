@@ -31,11 +31,13 @@ The first release is the smaller core: URL in, layered map, citation chat with y
 
 ## Current status
 
-Pre-code. Documentation only. No app, schema or deployment yet.
+Pre-code. Documentation only. No app, schema or deployment yet. Verified by reading the repository on 2026-10-16: the eleven documents listed in the README exist on main; no source code, migrations or tests exist.
+
+Scope note (2026-10-16, owner decision): release one now includes all functions of the related starred tools, not a smaller core. This supersedes the "smaller core" paragraph in the end goal above. Flagged and blocked items are listed in [PRD.md](PRD.md).
 
 ## Next up
 
-Phase 1, the spine:
+First, owner decisions on the flagged items in [PRD.md](PRD.md). Then phase 1, the spine:
 
 1. Self-hosted Supabase on the free-tier VM, with a backup job; measure real headroom.
 2. Indexing worker for one small public repo: clone, filter, secret scan, chunk, embed with a supplied key.
@@ -43,6 +45,11 @@ Phase 1, the spine:
 4. Then the map (phase 2): tree-sitter symbols and edges, layered canvas map, source viewer.
 
 ## Log
+
+### 2026-10-16 (scope and spine audit)
+- Owner decision: release one includes all functions of graphify, Understand-Anything, codegraph, code-review-graph, repomix, archify, headroom and graph-engineering. Catalogued as FR-001 to FR-044 in [PRD.md](PRD.md); features not adopted are listed there with reasons.
+- Applied the merged doc-spine standard: status labels, stable IDs (FR, NFR, JRN, SCR, DATA, API, TASK, TEST), traceability table in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), consistency audit. Nothing was built or run.
+- Decided: v1 languages are JS/TS and Python (FR-008). Decided: framework subset (FR-009); GitHub Action, MCP endpoint and custom languages in v1 (FR-032, FR-039, FR-043); not-adopted list confirmed. Decided: private repos (FR-042) move to v2.
 
 ### 2026-10-16
 - Added six planning documents from the doc-spine template: [PRD.md](PRD.md), [TRD.md](TRD.md), [APP_FLOW.md](APP_FLOW.md), [UI_UX_BRIEF.md](UI_UX_BRIEF.md), [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). Unset values are marked TBD.
