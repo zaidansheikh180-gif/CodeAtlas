@@ -78,3 +78,68 @@ The living decision log for this repository and its codebase: what was decided, 
 **Why:** The template documents capture product scope, stack, screens, schema and build phases in fixed fields that can be filled in as decisions land, instead of writing each document from scratch. The palette came from the owner's own reference image. The README list previously linked only ROADMAP.md, and the owner asked for the full list.
 
 **How implemented:** The six documents were published to main on 2026-10-16, one commit per file. [UI_UX_BRIEF.md](UI_UX_BRIEF.md) records the palette with the remaining values as TBD; [DESIGN.md](DESIGN.md) now names the palette in its visual-system section and requires flat fills, no gradients or glow. [README.md](README.md)'s project-documents section links all eleven documents. This supersedes the note in the 2026-10-10 entry that the README linked only ROADMAP.md. All of this is pre-code documentation; nothing is implemented.
+
+### 2026-10-16 - Release one includes all functions of the related starred tools
+
+**Decision:** CodeAtlas release one includes all the functions of the related starred tools (graphify, Understand-Anything, codegraph, code-review-graph, repomix, archify, headroom, graph-engineering), instead of deferring depth features to later releases. Items that cannot be confirmed feasible are flagged for the owner, not dropped.
+
+**Why:** Owner instruction on 2026-10-16: "it should have all there functions in v1". This follows the earlier stated bar of taking inspiration from all of them and being "the better one".
+
+**Alternatives considered:** The earlier plan (2026-10-10) kept a smaller first release and a later depth phase. It is superseded for scope, not erased.
+
+**Consequences and trade-offs (prediction):** v1 is larger and will take longer; capacity of one free-tier VM is unmeasured. Some items need owner decisions: broad language coverage, framework-aware routes, GitHub Action, hosted agent endpoint, custom languages, private repos.
+
+**Status:** Accepted for scope. Flagged items Proposed.
+
+**Implementation location:** Planned. Requirements in [PRD.md](PRD.md) (FR-001 to FR-044), tasks in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). Supersedes the first-release scope in the 2026-10-10 "Use living source documents" entry.
+
+### 2026-10-16 - Apply the merged doc-spine standard to the CodeAtlas documents
+
+**Decision:** Apply the merged doc-spine master prompt to all eleven documents: status labels, stable IDs, per-document sections, consistency audit and readiness gate.
+
+**Why:** Owner instruction on 2026-10-16: use the final doc spine.
+
+**Status:** Accepted. Edits are prepared for owner review; not yet pushed.
+
+**Implementation location:** Planned until pushed to main.
+
+### 2026-10-16 - v1 languages are JavaScript/TypeScript and Python
+
+**Decision:** CodeAtlas v1 parses JavaScript/TypeScript and Python. Other languages degrade to files only.
+
+**Why:** Owner approved the proposed list on 2026-10-16 ("1. ok"). No further reason recorded.
+
+**Status:** Accepted.
+
+**Implementation location:** Planned. See FR-008 in [PRD.md](PRD.md). Narrows the language breadth in the 2026-10-16 scope decision.
+
+### 2026-10-16 - v1 framework subset, agent access and exclusions
+
+**Decision:** v1 framework-aware routes cover Next.js, Express, NestJS, FastAPI, Flask and Django (owner left the pick to the assistant; others marked later). The GitHub Action, hosted MCP endpoint and custom language config are in v1, after a token, rate-limit and abuse design. The not-adopted list (local CLI and file watcher, Rust kernel and huge-repo scale, audio/video transcription, browser and VS Code extensions, headroom proxy and agent memory, paid cloud features, multi-language UI, wiki-analysis mode, diagram-from-description) is confirmed out of v1.
+
+**Why:** Owner replies on 2026-10-16: "better if all, or you can pick a subset"; "in v1"; "no need for them". The subset reason is the frameworks most used with the two chosen languages (assistant's rationale, not tested).
+
+**Status:** Accepted.
+
+**Implementation location:** Planned. FR-009, FR-032, FR-039, FR-043 in [PRD.md](PRD.md); TASK-029 in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+
+### 2026-10-16 - Private repositories proposed for v2
+
+**Decision:** Private repository support (GitHub OAuth) is proposed to move to v2, not v1.
+
+**Why:** Owner is undecided; the assistant recommended v2 because of token, storage and privacy risk. No owner approval yet.
+
+**Status:** Proposed (not Accepted). Do not treat as decided.
+
+**Implementation location:** Planned. FR-042 in [PRD.md](PRD.md).
+
+
+### 2026-10-16 - Private repositories accepted for v2
+
+**Decision:** Private repository support (GitHub OAuth, FR-042) is accepted for v2, not v1. It is the first item of v2.
+
+**Why:** The assistant recommended v2 (token storage and privacy risk on a free-tier VM, and it contradicts the owner's earlier "no"); the owner replied "letd do this, ok push" on 2026-10-16, approving that recommendation. This supersedes the "Proposed (not Accepted)" entry above, which is left unchanged.
+
+**Status:** Accepted.
+
+**Implementation location:** Planned. FR-042 in [PRD.md](PRD.md); TASK-027 in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
