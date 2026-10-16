@@ -4,12 +4,11 @@
 // (WASM), builds the graph and writes everything to IndexedDB. Repo contents
 // are untrusted input - parsed, never executed.
 
-import { unzipSync } from 'fflate'
 import { CAPS } from '../lib/caps'
 import { rawUrl, treeUrl } from '../lib/github'
 import { languageOf, shouldSkip, type FileLanguage } from '../lib/filter'
 import { scanForSecrets } from '../lib/secrets'
-import { getDB, fileId, putAll, putRepo, updateJob } from '../lib/db'
+import { countByRepo, fileId, isQuotaError, putAll, putRepo, updateJob } from '../lib/db'
 import { parseFile } from './parse'
 import { buildGraph, type FileParse } from './graph'
 import type { IndexRequest, IndexEvent } from '../lib/pipeline'
@@ -55,6 +54,7 @@ async function run(request: IndexRequest): Promise<void> {
   try {
     treeRes = await fetch(treeUrl(request.fullName, request.commit), {
       headers: request.token ? { Authorization: `Bearer ${request.token}` } : {},
+      signal: AbortSignal.timeout(30_000),
     })
   } catch {
     return fail('fetching', 'Could not reach GitHub. Check your connection and try again.', 'network')
@@ -128,27 +128,42 @@ async function run(request: IndexRequest): Promise<void> {
   let failedDownloads = 0
   const CONCURRENCY = 8
   let cursor = 0
-  const worker = async () => {
-    while (cursor < wanted.length) {
-      const item = wanted[cursor++]
-      try {
-        const res = await fetch(rawUrl(request.fullName, request.commit, item.path))
-        if (!res.ok) {
-          failedDownloads++
-          continue
-        }
-        const text = decoder.decode(await res.arrayBuffer())
-        kept.push({ path: item.path, language: languageOf(item.path), text, sha: item.sha })
-      } catch {
-        failedDownloads++
+  // Every request carries a timeout: a stalled connection must never wedge a
+  // download slot forever (measured need in phase 2, django run, 2026-10-16).
+  const downloadOne = async (item: { path: string; sha: string }): Promise<boolean> => {
+    try {
+      const res = await fetch(rawUrl(request.fullName, request.commit, item.path), {
+        signal: AbortSignal.timeout(20_000),
+      })
+      if (!res.ok) return false
+      const text = decoder.decode(await res.arrayBuffer())
+      kept.push({ path: item.path, language: languageOf(item.path), text, sha: item.sha })
+      return true
+    } catch {
+      return false
+    }
+  }
+  const failed: { path: string; sha: string }[] = []
+  const worker = async (queue: { path: string; sha: string }[], failures: { path: string; sha: string }[] | null) => {
+    while (cursor < queue.length) {
+      const item = queue[cursor++]
+      const ok = await downloadOne(item)
+      if (!ok) {
+        if (failures) failures.push(item)
+        else failedDownloads++
       }
       downloaded++
       if (downloaded % 20 === 0 || downloaded === wanted.length) {
-        post({ type: 'progress', stage: 'fetching', done: downloaded, total: wanted.length })
+        post({ type: 'progress', stage: 'fetching', done: Math.min(downloaded, wanted.length), total: wanted.length })
       }
     }
   }
-  await Promise.all(Array.from({ length: CONCURRENCY }, worker))
+  await Promise.all(Array.from({ length: CONCURRENCY }, () => worker(wanted, failed)))
+  // One retry pass over the failures; second failures are skipped for good.
+  if (failed.length > 0) {
+    cursor = 0
+    await Promise.all(Array.from({ length: CONCURRENCY }, () => worker(failed, null)))
+  }
   mark('fetchMs', t)
   if (kept.length === 0) {
     return fail('fetching', 'The file downloads all failed. Check your connection and try again.', 'network')
@@ -186,13 +201,21 @@ async function run(request: IndexRequest): Promise<void> {
   const files: FileRec[] = []
   const parses: FileParse[] = []
   let done = 0
+  let parseSkippedLarge = 0
+  // Very large single files are kept in the index but skip tree-sitter: a
+  // pathological parse must never stall the whole run (phase 2 hardening).
+  const PARSE_MAX_BYTES = 256_000
   for (const file of clean) {
     const ext = file.path.split('.').pop()?.toLowerCase() ?? ''
     let result = null
-    try {
-      result = await parseFile(file.language, file.text, ext)
-    } catch {
-      result = null // a single unparseable file degrades to "files only"
+    if (file.text.length > PARSE_MAX_BYTES) {
+      parseSkippedLarge++
+    } else {
+      try {
+        result = await parseFile(file.language, file.text, ext)
+      } catch {
+        result = null // a single unparseable file degrades to "files only"
+      }
     }
     files.push({
       id: fileId(request.repoId, file.path),
@@ -211,7 +234,11 @@ async function run(request: IndexRequest): Promise<void> {
   }
   mark('parseMs', t)
   const parsedCount = parses.filter((p) => p.result).length
-  stage('parsing', 'done', `${parsedCount} of ${files.length} files parsed`)
+  stage(
+    'parsing',
+    'done',
+    `${parsedCount} of ${files.length} files parsed${parseSkippedLarge > 0 ? `, ${parseSkippedLarge} very large file(s) kept without parsing` : ''}`,
+  )
 
   // --- Stage 5: build the graph ---
   stage('graph', 'active')
@@ -221,12 +248,9 @@ async function run(request: IndexRequest): Promise<void> {
   const extracted = edges.filter((e) => e.confidence === 'extracted').length
   stage('graph', 'done', `${symbols.length} symbols, ${edges.length} edges (${extracted} extracted, ${edges.length - extracted} inferred)`)
 
-  // --- Stage 6: store in IndexedDB ---
+  // --- Stage 6: store in IndexedDB, then read back and verify ---
   stage('storing', 'active')
   t = performance.now()
-  await putAll('files', files)
-  await putAll('symbols', symbols)
-  await putAll('edges', edges)
   const stats = {
     files: files.length,
     parsedFiles: parsedCount,
@@ -234,22 +258,50 @@ async function run(request: IndexRequest): Promise<void> {
     edges: edges.length,
     secretsExcluded: excludedSecrets.length,
   }
-  await putRepo({
-    id: request.repoId,
-    url: request.repoUrl,
-    fullName: request.fullName,
-    commit: request.commit,
-    defaultBranch: request.defaultBranch,
-    status: 'ready',
-    description: request.description,
-    language: request.language,
-    sizeKb: request.sizeKb,
-    stats,
-    indexedAt: Date.now(),
-  })
+  try {
+    await putAll('files', files)
+    await putAll('symbols', symbols)
+    await putAll('edges', edges)
+    await putRepo({
+      id: request.repoId,
+      url: request.repoUrl,
+      fullName: request.fullName,
+      commit: request.commit,
+      defaultBranch: request.defaultBranch,
+      status: 'ready',
+      description: request.description,
+      language: request.language,
+      sizeKb: request.sizeKb,
+      stats,
+      indexedAt: Date.now(),
+    })
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return fail(
+        'storing',
+        'This browser ran out of storage while saving the index. Clear an older index from the start page and try again.',
+        'storage_full',
+      )
+    }
+    throw error
+  }
+
+  // Read-back verification: the write is only done when the store agrees.
+  const [storedFiles, storedSymbols, storedEdges] = await Promise.all([
+    countByRepo('files', request.repoId),
+    countByRepo('symbols', request.repoId),
+    countByRepo('edges', request.repoId),
+  ])
+  if (storedFiles !== files.length || storedSymbols !== symbols.length || storedEdges !== edges.length) {
+    return fail(
+      'storing',
+      'The index did not save completely to browser storage. Clear an older index from the start page and try again.',
+      'storage_verify',
+    )
+  }
   mark('storeMs', t)
   mark('totalMs', t0)
-  stage('storing', 'done')
+  stage('storing', 'done', 'Saved and verified in this browser')
   post({ type: 'done', stats, timings, excludedSecrets, skipped: skipped as unknown as Record<string, number>, unparsedLanguages })
 }
 
