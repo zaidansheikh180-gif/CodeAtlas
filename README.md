@@ -6,6 +6,8 @@ CodeAtlas is a planned web app that turns a public GitHub repository into an int
 
 **Status: early planning, pre-code.** This repository documents the intended product. There is no running app or deployed demo yet. Features below are planned, not shipped.
 
+Release one is planned to include the functions of the related code-graph and repository tools, not a smaller subset. The full list with IDs and any items still undecided is in [PRD.md](PRD.md).
+
 ## The experience
 
 1. Paste a public GitHub repository URL or open a pre-indexed example.
@@ -45,7 +47,7 @@ The planned retrieval pipeline combines code chunks with graph context: callers,
 - Add the architecture map and source viewer.
 - Improve retrieval, citation checks and model settings.
 - Publish a tested demo with shareable maps.
-- Add guided tours, impact views, incremental indexing and exports in later releases.
+- Add guided tours, impact views, incremental indexing, sharing and exports. These are part of release one (owner decision, 2026-10-16), ordered in vertical slices in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
 
 Repository size caps, secret scanning and honest failure states are part of the product, not optional launch polish.
 
@@ -63,4 +65,4 @@ Repository size caps, secret scanning and honest failure states are part of the 
 - [Backend schema](BACKEND_SCHEMA.md) - planned database schema sketch.
 - [Implementation plan](IMPLEMENTATION_PLAN.md) - build phases with done criteria.
 
-CodeAtlas takes inspiration from existing code-graph and repository tools while aiming to build its own interface and workflow. The feature superset is a long-term direction, not a claim of current parity.
+CodeAtlas takes inspiration from existing code-graph and repository tools while aiming to build its own interface and workflow. Covering their functions is the release-one scope, not a claim of current parity: nothing is built yet.
