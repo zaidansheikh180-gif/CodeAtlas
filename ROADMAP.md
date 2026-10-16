@@ -34,9 +34,9 @@ Combine vector retrieval with graph context. Add streamed answers, citation chec
 
 Prepare graph-only public examples, read-only share links and useful failure states. Deploy the app, measure indexing and answer quality, and write documentation from observed behavior. No public performance or parity claims before those checks.
 
-## Phase 5: Add depth
+## Phase 5: Add depth (moved into release one, 2026-10-16)
 
-Build account history, incremental indexing, impact views, guided tours, exports and more language support. Evaluate private repositories, PR comparisons and agent integrations separately, with explicit access and privacy boundaries.
+Owner decision: these items are part of release one. They are ordered after the earlier phases but are not deferred to a later release. Original text follows. Build account history, incremental indexing, impact views, guided tours, exports and more language support. Evaluate private repositories, PR comparisons and agent integrations separately, with explicit access and privacy boundaries.
 
 ## Quality gates
 
