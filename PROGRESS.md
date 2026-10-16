@@ -50,6 +50,16 @@ Updated 2026-10-16 (late evening): phase 1 (browser spine) is built on the `inst
 
 ## Log
 
+### 2026-10-16 (map + panel polish pass, user-steered)
+After the user's field test on tt-a1i/archify (577 files, 3,879 symbols, 14,356 edges - largest repo indexed so far), a polish pass on the map and side panel. All items pixel-verified in headless Chromium against the dev server:
+- Unlinked modules no longer drift: modules with no import edges skip the force field and sit in a tidy grid beside the cluster under a "No imports found" label.
+- Tighter cluster: weak gravity (forceX/forceY) on linked nodes; settled layout re-fits to bounds on data change and on canvas resize (opening the panel shrinks the canvas).
+- Readability: node labels and file counts draw at a constant screen size regardless of zoom; fit zoom cap raised to 1.6.
+- Hint text at bottom left is now a padded, bordered chip (was clipped at the screen edge).
+- Side panel is resizable: drag handle on its left edge (role="separator", keyboard arrows), width clamped 280-860px and persisted in localStorage. Verified: drag 320 -> 584px, keyboard +48px, persists across reload.
+- Source preview: no more mid-word wrapping; lines keep their shape with horizontal scroll and sticky line numbers. Syntax coloring added (user request): Prism, lazy-loaded on first file open (core 19.5 kB + per-grammar chunks, only JS/TS/TSX/Python + markup/css/json/bash/yaml/toml/sql/markdown), colored with DESIGN.md palette steps only (Dragonfruit keywords, green strings, amber numbers, blue functions, muted comments). Files over 300 KB and unknown languages fall back to plain text.
+- Regression caught and fixed during this pass: moving the link array for the force simulation broke edge rendering (draw read the pre-resolution array); one shared array drives both now.
+
 ### 2026-10-16 (user field feedback, phase 1 map)
 User indexed https://github.com/tt-a1i/archify.git (a larger real repo) on the phase-1 build. Indexing completed fine at that size. Map issues to fix as polish (phase 2/6 input, not yet scheduled):
 1. Bottom-left hint text is clipped at the left edge of the canvas.

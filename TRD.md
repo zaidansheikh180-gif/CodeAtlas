@@ -38,7 +38,7 @@ Nothing is Verified: no code or tooling exists yet.
 
 ## Runtime, toolchain and workflow
 
-Fixed in phase 1 (Verified on the `instinct` branch): Node 22+ or Bun for tooling; Vite 7 dev server and build; TypeScript 5.8 (strict); React 19; Tailwind CSS 4 (`@tailwindcss/vite`). Commands: `bun install`, `bun run dev` (dev server), `bun run build` (type-check plus production build), `bun run typecheck`. Key libraries (Chosen in phase 1): `web-tree-sitter` + `tree-sitter-wasms` (WASM grammars as Vite `?url` assets), `idb` (IndexedDB), `d3-force` (map layout), Inter and JetBrains Mono via Fontsource. Graph renderer: custom canvas 2D renderer (Chosen in phase 1) - the layered drill-down renderer is still open for phase 6.
+Fixed in phase 1 (Verified on the `instinct` branch): Node 22+ or Bun for tooling; Vite 7 dev server and build; TypeScript 5.8 (strict); React 19; Tailwind CSS 4 (`@tailwindcss/vite`). Commands: `bun install`, `bun run dev` (dev server), `bun run build` (type-check plus production build), `bun run typecheck`. Key libraries (Chosen in phase 1): `web-tree-sitter` + `tree-sitter-wasms` (WASM grammars as Vite `?url` assets), `idb` (IndexedDB), `d3-force` (map layout), `prismjs` (lazy-loaded syntax coloring in the source preview), Inter and JetBrains Mono via Fontsource. Graph renderer: custom canvas 2D renderer (Chosen in phase 1) - the layered drill-down renderer is still open for phase 6.
 
 ## Third-party services
 

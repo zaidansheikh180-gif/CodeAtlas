@@ -13,9 +13,11 @@
   "dependencies": {
     "@fontsource/inter": "^5.2.5",
     "@fontsource/jetbrains-mono": "^5.2.5",
+    "@types/prismjs": "^1.26.6",
     "d3-force": "^3.0.0",
     "fflate": "^0.8.2",
     "idb": "^8.0.1",
+    "prismjs": "^1.30.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tree-sitter-wasms": "^0.1.12",
