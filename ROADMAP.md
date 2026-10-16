@@ -10,11 +10,18 @@ Chat and embeddings use the visitor's own Gemini key or their own reachable Olla
 
 ## Architecture
 
-- React, Vite and Tailwind frontend for the map, source viewer, chat and settings.
+Update 2026-10-16 (evening, owner decision): v1 is static-only. The v1 architecture is:
+
+- React, Vite and Tailwind frontend for the map, source viewer, chat and settings - this is the whole app.
+- A Web Worker does tree-sitter (WASM) parsing, graph building and analytics; IndexedDB holds the index and chat history.
+- The browser fetches public repositories from the GitHub API (archive first, contents and compare data as needed; the anonymous limit is about 60 requests/hour per visitor).
+- Graph-assisted retrieval combines matching chunks with related symbols and checks citations against the indexed commit, all locally. Chat calls the visitor's own Gemini key or Ollama endpoint directly.
+
+v2 (the original server plan, kept for that release):
+
 - API for repository submission, graph retrieval, chat and user settings.
 - Queued worker for shallow clones, filtering, secret scanning, tree-sitter parsing, symbol graphs and code chunks.
 - Self-hosted Supabase on a free-tier VM, with PostgreSQL, pgvector and auth.
-- Graph-assisted retrieval that combines matching chunks with related symbols and checks citations against the indexed commit.
 
 The API framework, graph renderer, hosting capacity and safe connection design for user-controlled model endpoints remain decisions to test. Embedding indexes must record the model and dimension; incompatible query embeddings cannot share an index.
 
@@ -34,9 +41,9 @@ Combine vector retrieval with graph context. Add streamed answers, citation chec
 
 Prepare graph-only public examples, read-only share links and useful failure states. Deploy the app, measure indexing and answer quality, and write documentation from observed behavior. No public performance or parity claims before those checks.
 
-## Phase 5: Add depth (moved into release one, 2026-10-16)
+## Phase 5: Add depth (moved into release one, 2026-10-16; split again 2026-10-16, evening)
 
-Owner decision: these items are part of release one. They are ordered after the earlier phases but are not deferred to a later release. Original text follows. Build account history, incremental indexing, impact views, guided tours, exports and more language support. Evaluate private repositories, PR comparisons and agent integrations separately, with explicit access and privacy boundaries.
+Owner decision: these items are part of release one. They are ordered after the earlier phases but are not deferred to a later release. Update 2026-10-16 (evening): the static-only v1 decision carved the server-dependent items back out - the hosted MCP endpoint, the GitHub Action, account history, multi-repo registry, hosted share previews and embeds, and private repositories are v2. Everything that runs in a browser stays in v1. Original text follows. Build account history, incremental indexing, impact views, guided tours, exports and more language support. Evaluate private repositories, PR comparisons and agent integrations separately, with explicit access and privacy boundaries.
 
 ## Quality gates
 
