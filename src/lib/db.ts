@@ -72,6 +72,18 @@ export async function putAll<T>(storeName: string, rows: T[]): Promise<void> {
   await tx.done
 }
 
+export async function countByRepo(storeName: string, repoId: string): Promise<number> {
+  const db = await getDB()
+  const keys = (await db.getAllKeysFromIndex(storeName, 'by-repo', repoId)) as string[]
+  return keys.length
+}
+
+// True when a failed write hit the browser's storage quota. IndexedDB raises
+// this as a DOMException named QuotaExceededError.
+export function isQuotaError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === 'QuotaExceededError'
+}
+
 export async function getAllByRepo<T>(storeName: string, repoId: string): Promise<T[]> {
   const db = await getDB()
   return (await db.getAllFromIndex(storeName, 'by-repo', repoId)) as T[]
@@ -99,7 +111,15 @@ export async function deleteRepo(repoId: string): Promise<void> {
     if (store === 'repos') {
       void tx.store.delete(repoId)
     } else if (store === 'messages') {
-      // messages are keyed by conversation; handled by caller for now (phase 1: none)
+      // messages are keyed by conversation: delete them through the repo's
+      // conversation ids so nothing orphaned survives eviction.
+      const convTx = db.transaction('conversations', 'readonly')
+      const conversationIds = (await convTx.store.index('by-repo').getAllKeys(repoId)) as string[]
+      await convTx.done
+      for (const conversationId of conversationIds) {
+        const messageKeys = (await tx.store.index('by-conversation').getAllKeys(conversationId)) as string[]
+        for (const key of messageKeys) void tx.store.delete(key)
+      }
     } else {
       const keys = (await tx.store.index('by-repo').getAllKeys(repoId)) as string[]
       for (const key of keys) void tx.store.delete(key)
