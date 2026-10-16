@@ -1,6 +1,6 @@
 # CodeAtlas UI/UX design brief
 
-Status: pre-code. [DESIGN.md](DESIGN.md) is the full rulebook and wins if the two ever disagree. This file is the quick-reference brief in the template format. The color palette below is set by the owner. Fonts and the remaining values are not chosen yet and say TBD rather than guess.
+Status: palette, fonts and surface values are chosen and built on the `instinct` branch (phase 1). [DESIGN.md](DESIGN.md) is the full rulebook and wins if the two ever disagree. This file is the quick-reference brief in the template format. The color palette below is set by the owner.
 
 Status labels used in this file: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
 
@@ -8,8 +8,8 @@ Status labels used in this file: Verified, Chosen, Proposed, Planned, Assumption
 |---|---|
 | Aesthetic | Premium, restrained, dark first. The map is the showpiece: a readable architecture, never a hairball. Plain language, few effects, each with a purpose. No AI-slop patterns (glowing orbs, default purple-blue gradients, generic three-card grids, sparkle icons, invented stats). |
 | Primary Color | Dragonfruit, HEX #FF4696 (pink). The one accent color, used for selection and primary actions. |
-| Background Color | Night Violet, HEX #1E1033 (deep violet). Base surface. Extra surface steps (raised panels, borders): TBD, to be derived from this base. |
-| Text Color | Dragonfruit #FF4696 on Night Violet surfaces, and Night Violet #1E1033 on Dragonfruit fills (for example buttons), as in the owner's palette reference. Neutral body and secondary text colors: TBD. Must meet WCAG AA contrast; Dragonfruit on Night Violet measures about 5.6:1 (computed), which passes AA for normal text. Long code and body text may need a neutral, TBD. |
+| Background Color | Night Violet, HEX #1E1033 (deep violet). Base surface. Extra surface steps (Chosen in phase 1, `src/theme.css`): `#281741`, `#322052`, `#3D2A63`; hairline border `#463171`. |
+| Text Color | Dragonfruit #FF4696 on Night Violet surfaces, and Night Violet #1E1033 on Dragonfruit fills (for example buttons), as in the owner's palette reference. Neutral body and secondary text colors (Chosen in phase 1, `src/theme.css`): `#F2EDFA` primary, `#B8A8D9` secondary, `#8A76B3` muted. Must meet WCAG AA contrast; Dragonfruit on Night Violet measures about 5.6:1 (computed), which passes AA for normal text. |
 | Accent / CTA Color | Dragonfruit #FF4696, same as primary. Night Violet text on it. Color on the map encodes layer or module, and edge confidence; never color alone, always paired with shape, label or pattern. |
 | Font | Inter (UI) and JetBrains Mono (code, paths, line numbers), bundled via Fontsource. Chosen in phase 1. Few size steps. Tabular numbers for counts and line numbers. |
 | Border Radius | 8px on inputs and buttons, 10-12px on cards and panels. Chosen in phase 1; consistent everywhere. |
