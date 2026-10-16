@@ -50,6 +50,13 @@ Updated 2026-10-16 (late evening): phase 1 (browser spine) is built on the `inst
 
 ## Log
 
+### 2026-10-16 (user field feedback, phase 1 map)
+User indexed https://github.com/tt-a1i/archify.git (a larger real repo) on the phase-1 build. Indexing completed fine at that size. Map issues to fix as polish (phase 2/6 input, not yet scheduled):
+1. Bottom-left hint text is clipped at the left edge of the canvas.
+2. Node labels and file-count numbers are too small to read comfortably.
+3. Unlinked modules drift far from the main cluster and scatter across empty space.
+4. The connected cluster stays cramped in one area while most of the canvas is empty.
+
 ### 2026-10-16 (phase 1 built, instinct branch)
 - Phase 1 (browser spine) built and verified in a real browser (headless Chromium, Playwright): static React + Vite + Tailwind v4 app (Bun), Web Worker indexing pipeline, IndexedDB storage layer, GitHub fetching, first module map. Code lives on the `instinct` branch; main is untouched.
 - Measured finding that changed the design: the GitHub zipball endpoint redirects to codeload.github.com, whose CORS header only allows render.githubusercontent.com - a browser app cannot read the archive from any other origin. Fetching instead uses one git-tree API request for the recursive file list, then raw.githubusercontent.com file downloads (CORS-open, not counted against the API rate limit), 8 at a time. Recorded in TRD.md and ARCHITECTURE.md.
