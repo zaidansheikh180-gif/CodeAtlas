@@ -116,7 +116,7 @@ Open design work, updated 2026-10-16 (evening): the server-side Ollama concern i
 
 ## 7. Limits and safety
 
-- **Size caps** on file count and total size after filtering. In v1 the caps reflect one browser tab's memory. Set in phase 1 (`src/lib/caps.ts`): 4,000 files, 25 MB of source text, 1 MB per file. Untested at the top end (phase 2 measures medium and large repos); the cost estimate is shown before indexing.
+- **Size caps** on file count and total size after filtering. In v1 the caps reflect one browser tab's memory. Set in phase 1 (`src/lib/caps.ts`): 4,000 files, 25 MB of source text, 1 MB per file. Measured in phase 2 (2026-10-16): a medium repo (fastapi, 2873 files) indexes in about 67 s; a large repo (django, 3595 files, 41200 symbols, 97366 edges) processes end to end, and a storage-quota hit at save fails with a named, actionable error instead of a silent stall. The cost estimate is shown before indexing. See [PROGRESS.md](PROGRESS.md).
 - **GitHub rate limit (added 2026-10-16, evening):** anonymous API use is limited to about 60 requests/hour per visitor IP. One index run costs 3 API requests (repo metadata, commit lookup, file tree); file contents come from raw.githubusercontent.com, which does not count against the limit. A rate-limit hit gets a named state with the wait time and the optional-token path (Chosen, owner, 2026-10-16 evening).
 - **Secret scanning** runs before any code reaches a model or an embedding index. Excluded files are listed.
 - **Honest failures:** unsupported language, oversized repo, quota hit and unreachable endpoint each get a plain explanation, not a generic error.
