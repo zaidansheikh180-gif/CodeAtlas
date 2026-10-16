@@ -4,7 +4,7 @@ Source of truth for how CodeAtlas is built. Anyone (human or LLM) reading only t
 
 **Status: pre-code.** Nothing below is built yet. Everything is planned unless [PROGRESS.md](PROGRESS.md) says it shipped. Open decisions are listed at the end.
 
-Related files: [README.md](README.md) (pitch), [ROADMAP.md](ROADMAP.md) (build order), [PROGRESS.md](PROGRESS.md) (dated log), [DESIGN.md](DESIGN.md) (UI rules).
+Related files: [README.md](README.md) (pitch), [ROADMAP.md](ROADMAP.md) (build order), [PROGRESS.md](PROGRESS.md) (dated log), [DESIGN.md](DESIGN.md) (UI rules). Planning documents: [PRD.md](PRD.md), [TRD.md](TRD.md), [APP_FLOW.md](APP_FLOW.md), [UI_UX_BRIEF.md](UI_UX_BRIEF.md), [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
 
 ## 1. Product shape
 
@@ -96,7 +96,7 @@ Open design work: safe handling of user-supplied Ollama URLs (a hosted server ca
 
 ## 8. Current status
 
-Pre-code. This repository holds documentation only: the README, roadmap and these source files. No app, schema, server or demo exists. See [PROGRESS.md](PROGRESS.md) for the latest state.
+Pre-code. This repository holds documentation only: the README, roadmap, these source files and the planning documents linked from the README. No app, schema, server or demo exists. See [PROGRESS.md](PROGRESS.md) for the latest state.
 
 ## 9. Open decisions
 
