@@ -54,6 +54,61 @@ The frontend is the whole app. Indexing, retrieval, citation checks and exports 
         +--> the user's own Gemini key or Ollama endpoint (embeddings, chat)
 ```
 
+
+Source of truth for how CodeAtlas is built. Anyone (human or LLM) reading only this file should understand the whole system. Update it in the same commit as any change that alters the design.
+
+**Status: pre-code.** Nothing below is built yet. Scope update 2026-10-16 (evening, owner decision): v1 is static-only - no server, no database server, no accounts. Sections below describe the original four-piece server design, now annotated: what runs in the browser in v1 and what moves to v2. The v2 design is kept for when a server returns. Everything is planned unless [PROGRESS.md](PROGRESS.md) says it shipped. Open decisions are listed at the end.
+
+Status labels: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
+
+Related files: [README.md](README.md) (pitch), [ROADMAP.md](ROADMAP.md) (build order), [PROGRESS.md](PROGRESS.md) (dated log), [DESIGN.md](DESIGN.md) (UI rules). Planning documents: [PRD.md](PRD.md), [TRD.md](TRD.md), [APP_FLOW.md](APP_FLOW.md), [UI_UX_BRIEF.md](UI_UX_BRIEF.md), [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+
+## 1. Product shape
+
+Paste a public GitHub repository URL. CodeAtlas indexes it and shows two things on one screen:
+
+- **The map:** an interactive, layered architecture graph of the codebase (modules, files, symbols, and the imports and calls between them). Free for everyone, no account, no key.
+- **The chat:** questions answered from the actual code, with clickable `file:line` citations tied to the indexed commit. Needs the user's own model access (see section 6).
+
+A map can be shared by link as a read-only view. Static v1 (2026-10-16, evening): the link carries the repo, commit and view state, and the recipient's browser re-indexes the repo; the exported standalone HTML file is the share that opens instantly. Hosted share previews are v2.
+
+## 2. The pieces
+
+### v1: one piece (static-only, owner decision 2026-10-16, evening)
+
+```
+[ React frontend on free static hosting ]
+        |
+        +--> Web Worker: tree-sitter (WASM) parsing, graph building, analytics
+        +--> IndexedDB: repos, files, symbols, edges, chunks, vectors, chats, settings
+        |
+        +--> GitHub API (recursive git tree for the file list, then raw file downloads
+        |    from raw.githubusercontent.com - the zipball/codeload endpoint is not
+        |    CORS-readable, measured 2026-10-16. Anonymous API limit ~60 requests/hour
+        |    per visitor IP; raw downloads do not count against it. Optional visitor
+        |    token, Chosen 2026-10-16)
+        +--> the visitor's own Gemini key (embeddings, chat) - direct browser call
+        +--> the visitor's own Ollama endpoint (embeddings, chat) - direct browser call,
+             needs OLLAMA_ORIGINS set on the visitor's side
+```
+
+The frontend is the whole app. Indexing, retrieval, citation checks and exports all run in the visitor's browser. There is nothing of the project's to keep running, and nothing about a visitor is stored anywhere but their own browser.
+
+### v2: the four pieces (superseded for v1 on 2026-10-16, evening; kept for the server release)
+
+```
+[ React frontend ]  --static host-->  free static hosting
+        |
+        v
+[ API server ]  ---->  [ Supabase: Postgres + pgvector + Auth ]
+        |                        self-hosted on a free-tier VM
+        v
+[ Indexing worker ]  --reads/writes-->  Supabase
+        |
+        +--> GitHub (shallow clone)
+        +--> the user's own Gemini key or Ollama endpoint (embeddings, chat)
+```
+
 1. **Frontend** - React, Vite, Tailwind. Pages: landing with URL input and pre-indexed examples, repo view (map, source viewer and chat), settings (model mode), read-only share view. Canvas-based graph renderer. See [DESIGN.md](DESIGN.md).
 2. **API server** - small service (Node/Fastify or Python/FastAPI, undecided). Submits indexing jobs, serves graph data for public repos without a key, runs the chat pipeline, manages per-user settings. Talks to Postgres directly. (v2.)
 3. **Indexing worker** - background process, one job at a time on the free-tier VM. Jobs live in a Postgres `jobs` table so a restart resumes the queue. (v2; in v1 the Web Worker is the worker and an IndexedDB `jobs` store is the queue.)
