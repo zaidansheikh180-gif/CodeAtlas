@@ -1,5 +1,7 @@
 # CodeAtlas design
 
+Status labels: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
+
 Design rules for the app. Source of truth for UI decisions; update it when a rule changes. Nothing here is built yet (see [PROGRESS.md](PROGRESS.md)). Technical context is in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Principles
@@ -73,3 +75,19 @@ Every screen defines these; none is an afterthought.
 - Say "planned" for anything not shipped, in docs and in the product.
 - No exaggerated claims ("blazing", "revolutionary"). Describe what it does.
 - Numbers shown in the product come from real data.
+
+## Release-one views (added 2026-10-16)
+
+Status: Proposed. Views added by the scope decision in [PRD.md](PRD.md) follow the existing rules: dark first, one accent, hairline borders, no gradients or glow.
+
+- **Generated vs parsed:** generated text (summaries, tours, wiki, domain view) always carries a visible "generated" label and a distinct treatment from parsed facts. Never rely on color alone.
+- **Impact view:** lists affected items with a risk label, and a separate "could not resolve" list. Conservative results are labelled as estimates.
+- **Tour and persona views:** step list with the current step shown on the map; persona switch changes detail level, not data.
+- **Share and export:** preview card and exports use the same palette tokens as the app.
+- **States to cover:** loading, empty, no model, quota, error, excluded files, unsupported language, PR not found, export in progress.
+- **Governance:** new components reuse existing tokens; one-off styles need a note here.
+
+## Open questions (added)
+
+- Fonts, radius, neutral and status colors remain TBD (see [UI_UX_BRIEF.md](UI_UX_BRIEF.md)).
+- Look of impact, tour and export views.
