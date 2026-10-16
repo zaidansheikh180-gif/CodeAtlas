@@ -10,6 +10,17 @@ Design rules for the app. Source of truth for UI decisions; update it when a rul
 2. **Honest by construction.** Show what the system knows, what it inferred and what it could not see. Never invent edges, numbers or claims.
 3. **Plain language.** Short sentences, no jargon where a simple word works. Tell the user what happened and what to do next.
 4. **Premium and restrained.** A quality dark interface, with few effects and each one purposeful.
+
+Status labels: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
+
+Design rules for the app. Source of truth for UI decisions; update it when a rule changes. The visual system (palette, type, radius, surfaces) is built in phase 1 on the `instinct` branch; views marked Proposed are later phases (see [PROGRESS.md](PROGRESS.md)). Technical context is in [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Principles
+
+1. **The map is the showpiece.** The first impression is a readable architecture, not a hairball.
+2. **Honest by construction.** Show what the system knows, what it inferred and what it could not see. Never invent edges, numbers or claims.
+3. **Plain language.** Short sentences, no jargon where a simple word works. Tell the user what happened and what to do next.
+4. **Premium and restrained.** A quality dark interface, with few effects and each one purposeful.
 5. **Fast and keyboard-first.** `/` or Cmd-K opens search anywhere.
 
 ## Visual system
@@ -54,7 +65,7 @@ Every screen defines these; none is an afterthought.
 
 | State | Behavior |
 |---|---|
-| Indexing | Real per-stage progress (cloning, filtering, parsing, graph, embedding) with an honest status. If the stage count or time is unknown, say so; no fake percentage. |
+| Indexing | Real per-stage progress (downloading, filtering, secret scanning, parsing, graph, saving; embedding when chat ships) with an honest status. If the stage count or time is unknown, say so; no fake percentage. |
 | Empty | Landing with one URL input and a few pre-indexed examples. Empty chat shows starter questions. |
 | No key | Calm setup card: chat uses your own model access, free to set up with a direct link, plus the Ollama option. The map stays fully usable. Never framed as an error. |
 | Quota hit | Plain message that the user's own key reached its limit, with options (wait, another key, Ollama). |
@@ -89,5 +100,5 @@ Status: Proposed. Views added by the scope decision in [PRD.md](PRD.md) follow t
 
 ## Open questions (added)
 
-- Fonts, radius, neutral and status colors remain TBD (see [UI_UX_BRIEF.md](UI_UX_BRIEF.md)).
+- Fonts, radius, neutral and status colors are Chosen in phase 1 (the Visual system section and `src/theme.css`).
 - Look of impact, tour and export views.
