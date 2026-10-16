@@ -6,9 +6,9 @@ Status labels used in this file: Verified, Chosen, Proposed, Planned, Assumption
 
 | Field | Content |
 |---|---|
-| Phase 1: Setup | Create the app and worker skeletons, folder structure, environment variable names, and self-hosted Supabase on the free-tier VM. Measure real VM headroom. Pick the API framework. Done when: Supabase runs on the VM, the project builds locally, and capacity numbers are recorded. |
-| Phase 2: Database | Fix the schema from BACKEND_SCHEMA.md as migrations: repos, files, symbols, edges, chunks, jobs. Enable pgvector. Set size caps and record them. Done when: migrations apply cleanly from empty and a test repo's rows can be written. |
-| Phase 3: Auth | Supabase Auth for per-user settings, RLS policies, encrypted key storage. Done when: a user can save and delete a key, no one else can read it, and keys never appear in logs. (Public map browsing stays account-free.) |
+| Phase 1: Setup | Updated 2026-10-16 (evening) for static v1: create the static app skeleton, folder structure, the Web Worker parsing pipeline, the IndexedDB storage layer and GitHub archive fetching. Measure real browser performance (parse time, memory) on the test repo set. Done when: the project builds locally, one repo's archive downloads and parses in a worker, and capacity numbers are recorded. Superseded v2 text: Create the app and worker skeletons, folder structure, environment variable names, and self-hosted Supabase on the free-tier VM. Measure real VM headroom. Pick the API framework. |
+| Phase 2: Database | Updated 2026-10-16 (evening) for static v1: define the IndexedDB object stores from BACKEND_SCHEMA.md (v1 local storage section). Set size caps and record them. Done when: a test repo's records can be written, read back and evicted cleanly. Superseded v2 text: migrations, Postgres and pgvector on the server. |
+| Phase 3: Auth | Superseded for v1 (2026-10-16, evening): v1 has no accounts. Replaced by the local settings store: the visitor can save and delete a Gemini key or Ollama endpoint in their own browser storage, keys never appear in logs, and the Ollama connectivity check detects CORS failures and explains the fix. Done when: that settings flow works. Supabase Auth and RLS move to v2. |
 | Phase 4: Core Feature 1 | Indexing worker for one small public repo: shallow clone, filtering, secret scanning, tree-sitter parsing, chunks, embeddings with a supplied key. Done when: one small repo indexes end to end with honest per-stage progress and a restart resumes the queue. |
 | Phase 5: Core Feature 2 | Chat with citations: retrieval endpoint, vector plus graph context, streamed answers, citation verification against the indexed commit. Done when: answers cite `file:line` that verify, and unverifiable lines are flagged. |
 | Phase 6: Core Feature 3 | Architecture map and source viewer: imports and call edges, layered drill-down, no-key graph browsing, citations that light up nodes, edge confidence shown. Done when: a real repo opens as a readable top-level map and every node opens its source. |
@@ -26,46 +26,54 @@ Roadmap phases 1 to 4 correspond to phases 1 to 9 here. Roadmap phase 5 (depth) 
 
 Status: Chosen. v1 now includes all functions of the related starred tools. See the requirements catalogue in [PRD.md](PRD.md). The nine phases above stay as the order of work; the tasks below are assigned to them. Phase gates are unchanged: tests, a usable demo and measured results.
 
+## Static-only v1 scope update (owner, 2026-10-16, evening)
+
+Status: Chosen. v1 is static-only: no server, no database server, no accounts. The full decision and the per-requirement split are in [PRD.md](PRD.md). Consequences for this plan:
+
+- Phase 1 no longer includes Supabase or a VM: setup is the static app skeleton, the Web Worker parsing pipeline, the IndexedDB storage layer and GitHub archive fetching. TASK-002 (Supabase on the VM) moves to v2.
+- TASK-025 (hosted MCP and registry), TASK-026 (GitHub Action calling a hosted API), TASK-027 (private repos) and TASK-029 (token and abuse design) are v2.
+- TASK-004, TASK-006, TASK-016, TASK-017, TASK-021 and TASK-022 keep their functions but their deliverables change to browser-side implementations; see the Release and updated notes in the catalogue below.
+
 ## Task catalogue
 
 All tasks: Status Planned. Estimates: none given. Definition of Done for each task: the linked tests pass, results are recorded in [PROGRESS.md](PROGRESS.md), and any numbers are measured, not assumed.
 
-| Task | Phase | Deliverable | Requirements |
-|---|---|---|---|
-| TASK-001 | Phase 1: Setup | Skeletons, folder structure, env variable names | FR-025 |
-| TASK-002 | Phase 1: Setup | Self-hosted Supabase on the VM, backup job, measure real headroom | all |
-| TASK-003 | Phase 1: Setup | Size caps and cost estimate | FR-003 |
-| TASK-004 | Phase 2: Database | Submit and queue: URL parsing (branch, tag, commit), jobs table, per-stage progress, resume on restart | FR-001, FR-002 |
-| TASK-005 | Phase 4: Core Feature 1 (indexing) | Filter and secret scanning | FR-004 |
-| TASK-006 | Phase 3: Auth | Model modes: key storage (encrypted), Gemini client, safe Ollama endpoint design | FR-025 |
-| TASK-007 | Phase 4: Core Feature 1 (indexing) | tree-sitter extraction (JS/TS, Python) and edges with confidence | FR-006, FR-007 |
-| TASK-008 | Phase 9: Deploy and release-one breadth | Language breadth beyond the first two; custom language config design | FR-008, FR-043 |
-| TASK-009 | Phase 9: Deploy and release-one breadth | Framework-aware route linking (subset TBD) | FR-009 |
-| TASK-010 | Phase 6: Core Feature 3 (map) | Graph analytics: communities, hubs, bridges | FR-010 |
-| TASK-011 | Phase 6: Core Feature 3 (map) | Surprise, knowledge gaps, execution flows | FR-011, FR-012 |
-| TASK-012 | Phase 6: Core Feature 3 (map) | Docs, rationale and doc-reference nodes | FR-013, FR-014 |
-| TASK-013 | Phase 4: Core Feature 1 (indexing) | Chunking, token counting, context trimming | FR-028 |
-| TASK-014 | Phase 6: Core Feature 3 (map) | Layered map renderer and non-visual tree view | FR-015, FR-023 |
-| TASK-015 | Phase 6: Core Feature 3 (map) | Source viewer and caller/source/callee panel | FR-016 |
-| TASK-016 | Phase 6: Core Feature 3 (map) | Search (full-text, fuzzy, semantic), path, explain, traversal | FR-017, FR-018 |
-| TASK-017 | Phase 5: Core Feature 2 (chat) | Chat: hybrid retrieval, streaming, citation verification, starter questions | FR-024, FR-026, FR-027 |
-| TASK-018 | Phase 6: Core Feature 3 (map) | Generated summaries and guided tours | FR-019, FR-020 |
-| TASK-019 | Phase 6: Core Feature 3 (map) | Domain view and persona views | FR-021, FR-022 |
-| TASK-020 | Phase 9: Deploy and release-one breadth | Impact: blast radius, PR/commit diff, architecture compare, refactor helpers | FR-029, FR-030, FR-031, FR-040 |
-| TASK-021 | Phase 9: Deploy and release-one breadth | Incremental re-index by commit | FR-033 |
-| TASK-022 | Phase 9: Deploy and release-one breadth | Share links, preview cards, embed | FR-034, FR-035 |
-| TASK-023 | Phase 9: Deploy and release-one breadth | Exports, packed-repo file, wiki | FR-036, FR-037, FR-038 |
-| TASK-024 | Phase 7: UI Polish | Error, empty, quota and excluded-file states | FR-005 |
-| TASK-025 | Phase 9: Deploy and release-one breadth | Hosted MCP endpoint and multi-repo registry (needs accounts; after TASK-029) | FR-039, FR-041 |
-| TASK-026 | Phase 9: Deploy and release-one breadth | GitHub Action (in v1; after TASK-029) | FR-032 |
-| TASK-027 | Phase 9: Deploy and release-one breadth | Private repos via GitHub OAuth (accepted for v2 on 2026-10-16; not in v1) | FR-042 |
-| TASK-028 | Phase 8: Testing | Measurement harness: token benchmark, indexing success, citation verification rate | FR-044 |
-| TASK-029 | Phase 9: Deploy and release-one breadth | Token, rate-limit and abuse design for the MCP endpoint, GitHub Action and share links (design before build) | FR-032, FR-039, FR-034 |
+| Task | Phase | Deliverable | Requirements | Release |
+|---|---|---|---|---|
+| TASK-001 | Phase 1: Setup | Skeletons, folder structure, env variable names | FR-025 | v1 static |
+| TASK-002 | Phase 1: Setup | Self-hosted Supabase on the VM, backup job, measure real headroom. Moved to v2 (2026-10-16, evening); v1 measures browser performance inside TASK-001's skeleton work instead | all | v2 |
+| TASK-003 | Phase 1: Setup | Size caps and cost estimate | FR-003 | v1 static |
+| TASK-004 | Phase 2: Database | Updated 2026-10-16 (evening): URL parsing (branch, tag, commit), archive-first GitHub fetching, per-stage progress, pause/resume from the IndexedDB jobs store. (Was: server jobs table.) | FR-001, FR-002 | v1 static |
+| TASK-005 | Phase 4: Core Feature 1 (indexing) | Filter and secret scanning | FR-004 | v1 static |
+| TASK-006 | Phase 3: Auth | Updated 2026-10-16 (evening): model modes with local-only settings storage, a browser-direct Gemini client, and the Ollama connectivity check with CORS guidance. (Was: encrypted server-side key storage, safe server-side Ollama proxy design.) | FR-025 | v1 static |
+| TASK-007 | Phase 4: Core Feature 1 (indexing) | tree-sitter extraction (JS/TS, Python) and edges with confidence | FR-006, FR-007 | v1 static |
+| TASK-008 | Phase 9: Deploy and release-one breadth | Language breadth beyond the first two; custom language config design | FR-008, FR-043 | v1 static |
+| TASK-009 | Phase 9: Deploy and release-one breadth | Framework-aware route linking (subset TBD) | FR-009 | v1 static |
+| TASK-010 | Phase 6: Core Feature 3 (map) | Graph analytics: communities, hubs, bridges | FR-010 | v1 static |
+| TASK-011 | Phase 6: Core Feature 3 (map) | Surprise, knowledge gaps, execution flows | FR-011, FR-012 | v1 static |
+| TASK-012 | Phase 6: Core Feature 3 (map) | Docs, rationale and doc-reference nodes | FR-013, FR-014 | v1 static |
+| TASK-013 | Phase 4: Core Feature 1 (indexing) | Chunking, token counting, context trimming | FR-028 | v1 static |
+| TASK-014 | Phase 6: Core Feature 3 (map) | Layered map renderer and non-visual tree view | FR-015, FR-023 | v1 static |
+| TASK-015 | Phase 6: Core Feature 3 (map) | Source viewer and caller/source/callee panel | FR-016 | v1 static |
+| TASK-016 | Phase 6: Core Feature 3 (map) | Search (client-side full-text and fuzzy over IndexedDB; semantic via the visitor's own key with local vectors), path, explain, traversal | FR-017, FR-018 | v1 static |
+| TASK-017 | Phase 5: Core Feature 2 (chat) | Chat: hybrid retrieval, streaming, citation verification, starter questions | FR-024, FR-026, FR-027 | v1 static |
+| TASK-018 | Phase 6: Core Feature 3 (map) | Generated summaries and guided tours | FR-019, FR-020 | v1 static |
+| TASK-019 | Phase 6: Core Feature 3 (map) | Domain view and persona views | FR-021, FR-022 | v1 static |
+| TASK-020 | Phase 9: Deploy and release-one breadth | Impact: blast radius, PR/commit diff, architecture compare, refactor helpers | FR-029, FR-030, FR-031, FR-040 | v1 static |
+| TASK-021 | Phase 9: Deploy and release-one breadth | Incremental re-index by commit | FR-033 | v1 static |
+| TASK-022 | Phase 9: Deploy and release-one breadth | Updated 2026-10-16 (evening): share links carrying repo, commit and view state (recipient re-indexes). Preview cards and the hosted embed move to v2; the standalone HTML export (TASK-023) is the portable share in v1 | FR-034, FR-035 | Split |
+| TASK-023 | Phase 9: Deploy and release-one breadth | Exports, packed-repo file, wiki | FR-036, FR-037, FR-038 | v1 static |
+| TASK-024 | Phase 7: UI Polish | Error, empty, quota and excluded-file states | FR-005 | v1 static |
+| TASK-025 | Phase 9: Deploy and release-one breadth | Hosted MCP endpoint and multi-repo registry (needs accounts and a server; after TASK-029). Moved to v2 (2026-10-16, evening) | FR-039, FR-041 | v2 |
+| TASK-026 | Phase 9: Deploy and release-one breadth | GitHub Action. Moved to v2 (2026-10-16, evening) because it called a hosted API; a CI-local variant with no hosted API is its planned v2 form (owner, 2026-10-16 evening) | FR-032 | v2 |
+| TASK-027 | Phase 9: Deploy and release-one breadth | Private repos via GitHub OAuth (accepted for v2 on 2026-10-16; not in v1) | FR-042 | v2 |
+| TASK-028 | Phase 8: Testing | Measurement harness: token benchmark, indexing success, citation verification rate | FR-044 | v1 static |
+| TASK-029 | Phase 9: Deploy and release-one breadth | Token, rate-limit and abuse design for the MCP endpoint, GitHub Action and hosted share links. Moved to v2 (2026-10-16, evening); v1 share links are public-repo URLs with no server state to abuse | FR-032, FR-039, FR-034 | v2 |
 
 ## Traceability: requirement to journey, task and test
 
 | Requirement | Journey | Task | Test |
-|---|---|---|---|
+|---|---|---|---|---|
 | FR-001 | JRN-001 | TASK-004 | TEST-001 |
 | FR-002 | JRN-001 | TASK-004 | TEST-002 |
 | FR-003 | JRN-001 | TASK-003 | TEST-003 |
@@ -117,16 +125,17 @@ Status: Proposed. Each TEST-nnn above gets a written check with expected result 
 
 ## Critical path
 
-1. VM headroom measured (TASK-002) decides how big the caps and the worker concurrency can be.
+1. Superseded 2026-10-16 (evening): VM headroom no longer gates v1 - there is no VM. Replaced by: browser parse time and memory measured on the test repo set (phase 1) decides the size caps, and the GitHub rate-limit strategy (archive-first, optional token) decides the fetch design.
 2. Language list (JS/TS, Python) and framework subset are decided (owner, 2026-10-16).
-3. TASK-029 (token and abuse design) must finish before TASK-025 and TASK-026. FR-042 (private repos) is accepted for v2.
+3. TASK-029 (token and abuse design) must finish before TASK-025 and TASK-026 - all three are v2 now. FR-042 (private repos) is accepted for v2.
 
 ## Vertical slices
 
-Slice 1: URL, index one small JS/TS repo, graph, minimal map, source viewer (no key). Slice 2: add cited chat with a supplied key. Slice 3: analytics, search, summaries, tours. Slice 4: impact views, incremental re-index. Slice 5: sharing, exports, MCP. These are order suggestions inside the one v1 scope.
+Slice 1: URL, index one small JS/TS repo, graph, minimal map, source viewer (no key). Slice 2: add cited chat with a supplied key. Slice 3: analytics, search, summaries, tours. Slice 4: impact views, incremental re-index. Slice 5: sharing (URL-state links and file exports) - MCP is v2. These are order suggestions inside the one v1 scope.
 
 ## Open questions
 
-- Whether auth should move before the first end-to-end demo.
+- Superseded 2026-10-16 (evening): whether auth should move before the first end-to-end demo - v1 has no auth.
 - Test repo set and measurement method.
-- Whether v1 can hold this scope on one free-tier VM (measured in TASK-002, not assumed).
+- Superseded 2026-10-16 (evening): whether v1 can hold this scope on one free-tier VM - replaced by: whether one browser tab can hold this scope (measured in phase 1, not assumed).
+- Decided 2026-10-16 (evening, owner): landing examples ship as bundled pre-built graphs.
