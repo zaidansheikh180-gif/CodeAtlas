@@ -44,6 +44,11 @@ Phase 1, the spine:
 
 ## Log
 
+### 2026-10-16
+- Added six planning documents from the doc-spine template: [PRD.md](PRD.md), [TRD.md](TRD.md), [APP_FLOW.md](APP_FLOW.md), [UI_UX_BRIEF.md](UI_UX_BRIEF.md), [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). Unset values are marked TBD.
+- Set the UI color palette from the owner's reference: Dragonfruit #FF4696 (single accent) on Night Violet #1E1033 (base background), recorded in [UI_UX_BRIEF.md](UI_UX_BRIEF.md) and [DESIGN.md](DESIGN.md). Dragonfruit on Night Violet measures about 5.6:1 contrast, passing WCAG AA for normal text.
+- Expanded the README project-documents list to link every document on main.
+
 ### 2026-10-09
 - Decided on the project after reviewing a set of starred code-graph and repository tools.
 - Wrote the project plan: four pieces (frontend, API, indexing worker, self-hosted Supabase), three model modes, build phases.
