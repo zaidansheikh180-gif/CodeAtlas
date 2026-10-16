@@ -4,6 +4,8 @@ Source of truth for how CodeAtlas is built. Anyone (human or LLM) reading only t
 
 **Status: pre-code.** Nothing below is built yet. Everything is planned unless [PROGRESS.md](PROGRESS.md) says it shipped. Open decisions are listed at the end.
 
+Status labels: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
+
 Related files: [README.md](README.md) (pitch), [ROADMAP.md](ROADMAP.md) (build order), [PROGRESS.md](PROGRESS.md) (dated log), [DESIGN.md](DESIGN.md) (UI rules). Planning documents: [PRD.md](PRD.md), [TRD.md](TRD.md), [APP_FLOW.md](APP_FLOW.md), [UI_UX_BRIEF.md](UI_UX_BRIEF.md), [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
 
 ## 1. Product shape
@@ -98,6 +100,30 @@ Open design work: safe handling of user-supplied Ollama URLs (a hosted server ca
 
 Pre-code. This repository holds documentation only: the README, roadmap, these source files and the planning documents linked from the README. No app, schema, server or demo exists. See [PROGRESS.md](PROGRESS.md) for the latest state.
 
+## 10. Release-one scope and components (added 2026-10-16)
+
+Status: Chosen (owner). Release one covers the functions of the related starred tools, listed with IDs in [PRD.md](PRD.md). The four pieces above stay; these responsibilities are added. All Planned.
+
+| Component | Added responsibility | Requirements |
+|---|---|---|
+| Indexing worker | Graph analytics (communities, hubs, bridges, surprise), execution flows, rationale and doc nodes, token counting and context trimming, commit-based incremental re-index | FR-010 to FR-014, FR-028, FR-033 |
+| API server | Search, path and explain, impact for symbols, PRs and commit ranges, share links, exports, packed-repo file, token-protected agent endpoint (in v1; design first) | FR-017, FR-018, FR-029 to FR-039 |
+| Frontend | Impact, tour and share/export views; persona detail; non-visual tree | FR-015, FR-019 to FR-023, FR-034 to FR-038 |
+| Model layer (user's own Gemini or Ollama) | Generated summaries, tours, domain view, wiki. Always labelled generated | FR-019 to FR-021, FR-038 |
+
+Flow: impact request. API resolves the symbol or fetches the public PR or commit range, indexes the changed commit if needed, walks the graph for callers and callees, and returns affected symbols with a risk score and a list of what could not be resolved. Failure: PR missing or over the caps returns a named error. Data lives in the entities DATA-010 to DATA-019 in [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md).
+
+Trust boundaries: cloned repo contents are untrusted input; user keys never leave their request; agent tokens (in v1; design first) are hashed and scoped; user-supplied Ollama URLs need server-side request safeguards.
+
+Not adopted from the inspiring tools, with reasons: see the table in [PRD.md](PRD.md).
+
+## 11. Glossary
+
+- **EXTRACTED / INFERRED:** an edge read directly from the syntax tree, or one guessed by resolution rules.
+- **Blast radius:** the symbols likely affected by changing one symbol. A conservative estimate, not proof.
+- **Community:** a cluster of closely linked nodes found by graph analysis.
+- **Generated:** text written by a model. Always labelled and never mixed with parsed facts.
+
 ## 9. Open decisions
 
 - API framework (Fastify or FastAPI).
@@ -106,3 +132,5 @@ Pre-code. This repository holds documentation only: the README, roadmap, these s
 - Exact size caps and chunking rules.
 - Safe design for user-controlled Ollama endpoints.
 - Embedding model choices per mode.
+- Whether the VM can run graph analytics alongside indexing for large repos (measure).
+- Token and abuse design for the agent endpoint (blocks FR-039).
