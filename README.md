@@ -4,14 +4,19 @@ Understand a codebase before you change it.
 
 CodeAtlas is a planned web app that turns a public GitHub repository into an interactive architecture map. Explore files, symbols and dependencies, then ask questions with answers grounded in the actual code and clickable `file:line` citations.
 
-**Status: early planning, pre-code.** This repository documents the intended product. There is no running app or deployed demo yet. Features below are planned, not shipped.
+
+Understand a codebase before you change it.
+
+CodeAtlas is a planned web app that turns a public GitHub repository into an interactive architecture map. Explore files, symbols and dependencies, then ask questions with answers grounded in the actual code and clickable `file:line` citations.
+
+**Status: v1 in build.** The browser spine (indexing pipeline, IndexedDB storage, module map, source preview) is built and measured on the `instinct` branch (see [PROGRESS.md](PROGRESS.md)); chat, settings and sharing are planned. There is no deployed demo yet.
 
 Release one is planned to include the functions of the related code-graph and repository tools, not a smaller subset. The full list with IDs and any items still undecided is in [PRD.md](PRD.md).
 
 ## The experience
 
 1. Paste a public GitHub repository URL or open a pre-indexed example.
-2. Follow indexing progress as the worker clones and parses the repository.
+2. Follow indexing progress as the worker downloads and parses the repository.
 3. Explore a layered map, select a node and read its source.
 4. Bring your own model to ask questions about the code.
 5. Share a read-only map link so someone else can explore without installing anything. (v1: the link re-indexes the repo in the recipient's browser; the exported standalone HTML map opens instantly.)
