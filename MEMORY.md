@@ -143,3 +143,37 @@ The living decision log for this repository and its codebase: what was decided, 
 **Status:** Accepted.
 
 **Implementation location:** Planned. FR-042 in [PRD.md](PRD.md); TASK-027 in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+
+### 2026-10-16 - Static-only v1: no backend
+
+**Decision:** CodeAtlas v1 runs entirely in the visitor's browser. There is no server, database server, account system or hosted API in v1. The browser fetches the public repository from the GitHub API (the repo archive first, then file contents and compare data as needed), parses it with tree-sitter compiled to WASM inside a Web Worker, builds and stores the graph in IndexedDB, and calls the visitor's own Gemini key or Ollama endpoint directly for chat, summaries and embeddings.
+
+**Why:** While planning the Oracle VM setup, the owner asked whether CodeAtlas even needs a backend. Two options were laid out: (A) static-only v1 where server features move to v2, or (B) keep everything in v1 with a backend. The owner chose A ("lets go with A FOR v1", WhatsApp, 2026-10-16 evening). The tradeoff accepted: no hosted share previews, no accounts, no hosted MCP or GitHub Action in v1, and the GitHub anonymous rate limit (about 60 requests/hour per visitor) shapes the fetch design. What is gained: nothing to host, nothing to pay for, nothing to keep running, and no keys or visitor data ever touch a project server.
+
+**Alternatives considered:** Keep the backend plan (four pieces on a free-tier VM) - rejected by the owner for v1, kept as the v2 design. A middle path (thin API only) was not requested.
+
+**Status:** Accepted.
+
+**How implemented:** Documentation only so far. [PRD.md](PRD.md) records the decision and every requirement now carries a Release label (v1 static / v2 / Split). [TRD.md](TRD.md), [APP_FLOW.md](APP_FLOW.md), [ARCHITECTURE.md](ARCHITECTURE.md), [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), [PROGRESS.md](PROGRESS.md), [README.md](README.md) and [ROADMAP.md](ROADMAP.md) carry superseded-note annotations; old server text is kept in place marked as the v2 plan. [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md) gains the v1 IndexedDB storage sketch. No code exists yet.
+
+### 2026-10-16 - Server-dependent features move to v2
+
+**Decision:** With the static-only v1, these leave release one: the hosted MCP endpoint (FR-039), the GitHub Action that calls a hosted API (FR-032), the multi-repo registry with accounts (FR-041), the hosted social preview card and hosted iframe embed (the hosted parts of FR-034 and FR-035), and the supporting server track: the API server, indexing worker, self-hosted Supabase, Supabase Auth, and the token/rate-limit/abuse design (TASK-029). They join private repositories (FR-042), which were accepted for v2 earlier the same day.
+
+**Why:** Each one fundamentally needs a server, and v1 has none. Everything that can run in a browser stays in v1, including search (client-side full-text and fuzzy; semantic via the visitor's own key), impact views, incremental re-index (browser re-fetches changed files), exports (generated in the browser), and custom tree-sitter languages (WASM grammars - the visitor's own browser replaces the server-side sandbox).
+
+**Consequences and trade-offs (prediction):** In v1 a share link re-indexes the repo in the recipient's browser instead of opening a stored map; the standalone HTML export (FR-036) becomes the portable way to share a finished map. The hosted MCP endpoint and Action wait for the v2 server. A CI-local GitHub Action variant (analysis runs inside the CI job, no hosted API) is Proposed, not decided.
+
+**Status:** Accepted.
+
+**Implementation location:** Planned. Release labels in [PRD.md](PRD.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md); v2 schema and API catalogue kept in [BACKEND_SCHEMA.md](BACKEND_SCHEMA.md). This supersedes the in-v1 placement of FR-032, FR-039 and FR-041 in the earlier 2026-10-16 scope entries, which are left unchanged above.
+
+### 2026-10-16 - Follow-up decisions: visitor GitHub token, bundled examples, Action in v2
+
+**Decision:** Three open points from the static-only v1 rescope are settled. (1) Visitors may optionally paste their own GitHub token to raise the API rate limit; the token is stored only in their browser and sent nowhere but GitHub. (2) The landing-page examples ship as bundled pre-built graphs with the static site, so the demo opens instantly and costs the visitor no rate limit. (3) The GitHub Action stays in v2; the CI-local variant (the analysis runs inside the CI job itself, no hosted API) is its planned v2 form.
+
+**Why:** Owner answers on 2026-10-16 (evening, WhatsApp): "1. yes 2. lets do that 3. we'll do this in v2". (1) recovers headroom for visitors who index several repos against the anonymous 60 requests/hour limit, without the project ever holding a token. (2) makes the first screen instant and immune to rate limits. (3) keeps v1 free of server-dependent work while leaving a server-free Action design open for v2.
+
+**Status:** Accepted.
+
+**How implemented:** Recorded in [PRD.md](PRD.md) (FR-001 note, decision section, open questions), [TRD.md](TRD.md) (GitHub API and constraints rows), [APP_FLOW.md](APP_FLOW.md) (rate-limit state, examples decision), [ARCHITECTURE.md](ARCHITECTURE.md) (v1 diagram and open decisions), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) (TASK-026 note, open questions) and [PROGRESS.md](PROGRESS.md) (log). This entry supersedes the "Proposed, not decided" status of the CI-local Action variant and the Proposed status of the visitor token in the two entries above; those entries are left unchanged.
