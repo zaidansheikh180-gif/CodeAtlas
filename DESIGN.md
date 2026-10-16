@@ -12,7 +12,8 @@ Design rules for the app. Source of truth for UI decisions; update it when a rul
 
 ## Visual system
 
-- **Theme:** dark first. Near-black surfaces with a small set of neutral steps; one accent color for selection and primary actions. Light theme is later work.
+- **Theme:** dark first. Deep violet surfaces with a small set of steps derived from the base; one accent color for selection and primary actions. Light theme is later work.
+- **Palette (set by the owner):** Dragonfruit `#FF4696` (pink) is the single accent, used for selection, primary actions and key text on dark. Night Violet `#1E1033` (deep violet) is the base background. Use Night Violet text on Dragonfruit fills and Dragonfruit text on Night Violet surfaces. Dragonfruit on Night Violet is about 5.6:1 contrast (computed). Neutral text steps, extra surface steps, status colors and map layer colors are not chosen yet (TBD); see [UI_UX_BRIEF.md](UI_UX_BRIEF.md).
 - **Type:** one clean sans for UI, one monospace for code, paths and line numbers. A clear size scale with few steps. Tabular numbers for counts and line numbers.
 - **Spacing:** one spacing scale. Tight, deliberate spacing on mobile; no oversized padding to fill screens.
 - **Shape and depth:** consistent radii, hairline borders instead of heavy shadows. Layer by surface color, not by glow.
@@ -21,7 +22,7 @@ Design rules for the app. Source of truth for UI decisions; update it when a rul
 
 ## What to avoid (no AI-slop)
 
-- Gradient-heavy hero sections, glowing orbs, purple-blue default gradients.
+- Gradient-heavy hero sections, glowing orbs, purple-blue default gradients. Use the palette as flat solid fills, not gradients or glow.
 - Generic three-card feature grids and stock sparkle icons.
 - Made-up stats, fake testimonials, fake user counts, invented benchmarks.
 - Marketing filler copy. Every sentence either helps the user act or is removed.
