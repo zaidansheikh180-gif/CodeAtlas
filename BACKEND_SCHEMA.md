@@ -2,6 +2,8 @@
 
 Status: pre-code. This is a sketch from [ARCHITECTURE.md](ARCHITECTURE.md), section 5. Nothing is migrated. The schema gets fixed in phase 1 and recorded here. Column lists below are planned and some types are TBD.
 
+Scope update 2026-10-16 (evening, owner decision): v1 is static-only - there is no server database in v1. Everything below the new v1 section describes the v2 server schema and is kept for that work. v1 stores the same kinds of records in the visitor's browser (IndexedDB); see the next section.
+
 Status labels used in this file: Verified, Chosen, Proposed, Planned, Assumption, TBD, Blocked. Unlabelled content is Planned.
 No migration file exists, so every object here is Planned.
 
@@ -24,9 +26,27 @@ No migration file exists, so every object here is Planned.
 | File Storage | No user file uploads planned. Repository contents are cloned by the worker; whether any file content is stored beyond chunk text is TBD. Database backups: scheduled dumps to object storage (planned). |
 | Sensitive Fields | Gemini key: encrypted at rest, never logged, deletable by the user. Ollama endpoint URL: treated as sensitive; validated for safe use. Files flagged by secret scanning are excluded before indexing and the exclusion is listed. |
 
+## v1 local storage (IndexedDB) - added 2026-10-16 (evening)
+
+Status: Planned. v1 has no server, so the index and chat state live in the visitor's browser. Object stores (IndexedDB), mirroring the v2 tables:
+
+| Store | Holds | v2 counterpart |
+|---|---|---|
+| repos | URL, name, commit hash, status, summary | DATA-001 |
+| files | repo, path, language, size, content hash | DATA-002 |
+| symbols | file, kind, name, start and end line | DATA-003 |
+| edges | from, to, type, confidence (extracted/inferred) | DATA-004 |
+| chunks | file, line range, text, optional embedding vector, embedding model and dimension | DATA-005 |
+| jobs | repo, stage, progress, error (for pause/resume within the browser session) | DATA-006 |
+| conversations, messages | chat history per repo, this browser only | DATA-007, DATA-008 |
+| settings | model mode, Gemini key, Ollama endpoint - this browser only, sent nowhere but the chosen provider | DATA-009 |
+| communities, graph_metrics, flows, rationale_notes, summaries, tours, analyses | analytics and generated content, computed in the browser | DATA-010 to DATA-016 |
+
+Not in v1: users, share_links, api_tokens, repo_registry (DATA-017 to DATA-019) - they need a server and accounts, so they are v2. Invariants carry over: an edge connects nodes of one repo and one commit; generated rows always carry a generated flag; vectors from different models never share an index. Browser storage can be evicted under storage pressure, so the IndexedDB index is a cache, not a durable store; the standalone HTML export (FR-036) is the durable artifact. There is no RLS in v1: each browser holds only its owner's data.
+
 ## Entity IDs and release-one additions
 
-Status: Planned. DATA-001 repos, DATA-002 files, DATA-003 symbols, DATA-004 edges, DATA-005 chunks, DATA-006 jobs, DATA-007 conversations, DATA-008 messages, DATA-009 user_settings (all described in the table above). Added for the 2026-10-16 scope decision (columns TBD):
+Status: Planned. DATA-001 repos, DATA-002 files, DATA-003 symbols, DATA-004 edges, DATA-005 chunks, DATA-006 jobs, DATA-007 conversations, DATA-008 messages, DATA-009 user_settings (all described in the table above). Added for the 2026-10-16 scope decision (columns TBD). The v1/v2 split (2026-10-16, evening): DATA-010 to DATA-016 have v1 browser-store counterparts (table above); DATA-017, DATA-018 and DATA-019 are v2-only.
 
 | ID | Entity | Purpose | Requirements |
 |---|---|---|---|
@@ -45,11 +65,11 @@ Invariants: an edge connects nodes of one repo and one commit; generated rows al
 
 ## Access matrix
 
-Status: Proposed. Anonymous: read public repos, maps, shares. Signed-in user: own settings, chats, tokens, registry. API and worker only: write repos, files, symbols, edges, chunks, jobs, communities, metrics, flows, rationale notes, analyses. Cross-user and unauthorised-access tests are required (TEST IDs assigned when RLS is written).
+Status: Proposed. v2-only (2026-10-16, evening): v1 is single-user per browser, so no access matrix applies. Anonymous: read public repos, maps, shares. Signed-in user: own settings, chats, tokens, registry. API and worker only: write repos, files, symbols, edges, chunks, jobs, communities, metrics, flows, rationale notes, analyses. Cross-user and unauthorised-access tests are required (TEST IDs assigned when RLS is written).
 
 ## API catalogue
 
-Status: Planned, paths TBD. API-001 submit repo. API-002 job status. API-003 graph data (public, no key). API-004 node source and callers/callees. API-005 search. API-006 path and explain. API-007 chat (streamed). API-008 settings. API-009 impact (symbol, PR, commits). API-010 tours and summaries. API-011 share link create and read. API-012 exports. API-013 packed-repo file. API-014 MCP endpoint (in v1; design first). Each gets auth, input and output schema, errors, rate limits and idempotency when designed.
+Status: Planned, paths TBD. Superseded for v1 (2026-10-16, evening): v1 has no API - the browser talks only to GitHub and the visitor's own model provider. This catalogue is v2. API-001 submit repo. API-002 job status. API-003 graph data (public, no key). API-004 node source and callers/callees. API-005 search. API-006 path and explain. API-007 chat (streamed). API-008 settings. API-009 impact (symbol, PR, commits). API-010 tours and summaries. API-011 share link create and read. API-012 exports. API-013 packed-repo file. API-014 MCP endpoint (v2 per the 2026-10-16 evening decision). Each gets auth, input and output schema, errors, rate limits and idempotency when designed.
 
 ## Migration and rollback
 
@@ -69,8 +89,6 @@ TBD. Planned areas: submit repo, job status, graph data for public repos (no key
 
 ## Open questions
 
-- Final column types and sign-in methods.
-- Policy details and what repository content is stored.
-- Whether anonymous users may submit repos or only open examples.
-- Column definitions for DATA-010 to DATA-019.
-- Token hashing and rate-limit design for DATA-018 (blocks FR-039).
+- v1: IndexedDB store shapes, indexes, and how much repository content is kept beyond chunk text.
+- v1: eviction handling - detect a missing or partial cache and offer re-index.
+- v2 (deferred): final column types and sign-in methods; policy details; whether anonymous users may submit repos; column definitions for DATA-017 to DATA-019; token hashing and rate-limit design for DATA-018 (blocks FR-039).
