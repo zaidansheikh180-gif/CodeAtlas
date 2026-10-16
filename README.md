@@ -14,7 +14,7 @@ Release one is planned to include the functions of the related code-graph and re
 2. Follow indexing progress as the worker clones and parses the repository.
 3. Explore a layered map, select a node and read its source.
 4. Bring your own model to ask questions about the code.
-5. Share a read-only map link so someone else can explore without installing anything.
+5. Share a read-only map link so someone else can explore without installing anything. (v1: the link re-indexes the repo in the recipient's browser; the exported standalone HTML map opens instantly.)
 
 The goal is a readable architecture view, not a wall of nodes. Start with the major modules and drill down to the files and functions behind them.
 
@@ -34,20 +34,23 @@ The planned retrieval pipeline combines code chunks with graph context: callers,
 
 ## Planned stack
 
-- **Frontend:** React, Vite and Tailwind CSS.
-- **Data and auth:** self-hosted Supabase, PostgreSQL and pgvector.
-- **Infrastructure:** Free-tier VM target, subject to available resources and measured capacity.
-- **Indexing:** a queued worker, shallow clones, code filtering and tree-sitter parsing.
-- **Retrieval:** symbol-aware chunks, embeddings and graph-assisted ranking.
-- **Models:** caller-supplied Gemini credentials or a caller-controlled Ollama endpoint.
+Update 2026-10-16 (evening, owner decision): release one is a fully static app - no server, no database server, no accounts. The browser downloads the repository from the GitHub API, parses it with tree-sitter compiled to WASM in a Web Worker, stores the graph in IndexedDB, and calls the visitor's own model directly. The server stack below is the v2 plan.
+
+- **Frontend:** React, Vite and Tailwind CSS. In v1 this is the whole app.
+- **Data and auth:** v1: IndexedDB in the visitor's browser, no accounts. v2: self-hosted Supabase, PostgreSQL and pgvector.
+- **Infrastructure:** v1: free static hosting only. v2: free-tier VM target, subject to available resources and measured capacity.
+- **Indexing:** v1: in-browser worker, GitHub archive downloads, code filtering and tree-sitter (WASM) parsing. v2: a queued worker with shallow clones.
+- **Retrieval:** symbol-aware chunks, embeddings and graph-assisted ranking - computed locally in v1.
+- **Models:** caller-supplied Gemini credentials or a caller-controlled Ollama endpoint, called directly from the browser.
 
 ## Build order
 
-- Prove the indexing and citation-chat pipeline on one small repository.
+- Prove the in-browser indexing and citation-chat pipeline on one small repository.
 - Add the architecture map and source viewer.
 - Improve retrieval, citation checks and model settings.
 - Publish a tested demo with shareable maps.
-- Add guided tours, impact views, incremental indexing, sharing and exports. These are part of release one (owner decision, 2026-10-16), ordered in vertical slices in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+- Add guided tours, impact views, incremental indexing, sharing and exports. These are part of release one (owner decisions, 2026-10-16), ordered in vertical slices in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+- v2 (owner decision, 2026-10-16, evening): everything that needs a server - the hosted MCP endpoint, the GitHub Action, accounts and multi-repo registry, hosted share previews, private repositories, and the Supabase backend itself.
 
 Repository size caps, secret scanning and honest failure states are part of the product, not optional launch polish.
 
