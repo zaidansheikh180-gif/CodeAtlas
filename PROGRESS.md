@@ -102,3 +102,17 @@ User indexed https://github.com/tt-a1i/archify.git (a larger real repo) on the p
 - Wrote a competitive teardown of six existing tools, producing a checklist of 27 features to match or beat and 10 new features of our own. It is kept private and is not published here.
 - Created this public repository.
 - Published README.md and ROADMAP.md.
+
+### 2026-10-16 (phase 2: storage hardening and large-repo measurements)
+- Storage hardening (`src/lib/db.ts`, `src/workers/index.worker.ts`):
+  - Every index write is read back and verified against the store; a mismatch fails the job with a plain message instead of leaving a half-written index behind.
+  - Quota errors (`QuotaExceededError`) are caught at save and shown as a designed message: "This browser ran out of storage while saving the index. Clear an older index from the start page and try again."
+  - Eviction is complete: clearing a repo removes its files, symbols, edges and its chat conversations and messages (previously conversations and messages stayed behind).
+  - Clear entry points: a per-repo "Clear" button on the start page and a "Clear index" button in the repo view header.
+- Fetch and parse hardening: a 30 s timeout on the tree request and 20 s on each raw file, one retry pass over failed downloads, and a 256 KB per-file parse guard so one very large file cannot wedge the worker. The phase-1 large-repo failure mode (a silent ~14 minute stall ending in the tab dying) no longer occurs.
+- Measured on this branch with Playwright against `bun run dev`:
+  - `tiangolo/fastapi` (medium): 2873 files, 5995 symbols, 12104 edges (11908 extracted, 196 inferred), 67 s wall. Saved and read-back verified.
+  - `django/django` (large): 3595 files downloaded (214 skipped as vendored, binary or generated; 3 excluded by secret scanning), 2863 files parsed, 41200 symbols, 97366 edges (77841 extracted, 19525 inferred). In the constrained test sandbox the final save hit the browser storage quota; the new quota path caught it and showed the designed message instead of wedging. Desktop browsers carry a far larger quota; the save path itself is verified by the read-back check on smaller repos.
+  - `microsoft/vscode` (over the caps): measurement inconclusive in the test sandbox - the tab returned to the start page before the index completed, consistent with the renderer being killed under memory pressure during parse/graph of 4000 TypeScript files. Memory headroom for cap-sized TS repos is the open follow-up.
+- Eviction verified by inspection: after clearing from either entry point, IndexedDB holds zero files, symbols, edges, conversations and messages for that repo.
+- Final caps (`src/lib/caps.ts`): 4000 files, 25 MB of source text, 1 MB per file, plus the 256 KB parse guard in the worker.
