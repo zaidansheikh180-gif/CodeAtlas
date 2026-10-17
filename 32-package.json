@@ -1,0 +1,36 @@
+{
+  "name": "codeatlas",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Paste any GitHub repo - get an interactive architecture map and chat that answers from the actual code, with file:line citations.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && node scripts/build-sw.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.5",
+    "@fontsource/jetbrains-mono": "^5.2.5",
+    "@types/prismjs": "^1.26.6",
+    "d3-force": "^3.0.0",
+    "fflate": "^0.8.2",
+    "idb": "^8.0.1",
+    "prismjs": "^1.30.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tree-sitter-wasms": "^0.1.12",
+    "web-tree-sitter": "^0.25.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.4",
+    "@types/d3-force": "^3.0.10",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.0",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.0"
+  }
+}
