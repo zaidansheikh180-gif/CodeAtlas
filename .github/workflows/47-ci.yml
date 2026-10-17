@@ -1,0 +1,31 @@
+# CI for CodeAtlas: typecheck, unit tests, and a production build on every
+# push to instinct/main and every pull request. Uses Bun 1.3.14 to match the
+# documented local setup.
+name: CI
+
+on:
+  push:
+    branches: [instinct, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Unit tests
+        run: bun test
+
+      - name: Production build
+        run: bun run build
